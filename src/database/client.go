@@ -3,6 +3,7 @@ package database
 import (
 	"log"
 
+	"github.com/peidrao/instago/src/domain/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -17,4 +18,9 @@ func Connect(connectionString string) {
 		panic("Cannot connect to database")
 	}
 	log.Println("Connected to database")
+}
+
+func Migrate() {
+	Instance.AutoMigrate(&models.User{})
+	log.Println("Database migration complete")
 }
