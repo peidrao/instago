@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user_insta
+      POSTGRES_PASSWORD: insta@go
+      POSTGRES_DB: instago_db
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
