@@ -24,7 +24,6 @@ func RegisterUser(context *gin.Context) {
 	err := validate.Struct(user)
 	if err != nil {
 		for _, err := range err.(validator.ValidationErrors) {
-			// log.Println("Erro: ", x)
 			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			context.Abort()
 			return
@@ -33,9 +32,7 @@ func RegisterUser(context *gin.Context) {
 
 	user.Password, _ = utils.HashPassword(user.Password)
 	user.Active = true
-
-	log.Println(user)
-
+	log.Println("\n\n\n", user)
 	record := database.Instance.Create(&user)
 
 	if record.Error != nil {
@@ -44,5 +41,5 @@ func RegisterUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"user_id": user.ID, "username": user.Username, "email": user.Email})
+	context.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
 }
