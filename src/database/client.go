@@ -2,25 +2,24 @@ package database
 
 import (
 	"log"
+	"os"
 
 	"github.com/peidrao/instago/src/domain/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var Instance *gorm.DB
-var dbError error
+func Init() *gorm.DB {
+	dsn := "host=localhost user=" + os.Getenv("POSTGRES_USER") + " password=" + os.Getenv("POSTGRES_PASSWORD") + " dbname=" + os.Getenv("POSTGRES_DB") + " port=5432"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
-func Connect(connectionString string) {
-	Instance, dbError = gorm.Open(postgres.Open(connectionString), &gorm.Config{})
-	if dbError != nil {
-		log.Fatal(dbError)
-		panic("Cannot connect to database")
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
 	}
-	log.Println("Connected to database")
-}
 
-func Migrate() {
-	Instance.AutoMigrate(&models.User{})
-	log.Println("Database migration complete")
+	log.Println("Connected to database")
+
+	db.AutoMigrate(&models.User{})
+
+	return db
 }
