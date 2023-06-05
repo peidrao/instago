@@ -17,6 +17,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	api.POST("users/", userHandler.RegisterUser)
 	api.GET("users/:id", userHandler.GetUser)
+	api.DELETE("users/:id", userHandler.RemoveUser)
 
 	return router
 }
