@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -56,4 +57,24 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
+}
+
+func (h *UserHandler) GetUser(context *gin.Context) {
+	id := context.Param("id")
+
+	var userID uint
+
+	if _, err := fmt.Sscan(id, &userID); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
+		return
+	}
+
+	user, err := h.userRepo.GetUserByID(userID)
+	if err != nil {
+		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
+		return
+	}
+
+	context.JSON(http.StatusAccepted, user)
+
 }

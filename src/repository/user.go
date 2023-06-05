@@ -7,6 +7,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(user *models.User) error
+	GetUserByID(id uint) (*models.User, error)
 }
 
 type DBUserRepository struct {
@@ -24,4 +25,14 @@ func (u *DBUserRepository) CreateUser(user *models.User) error {
 		return err
 	}
 	return nil
+}
+
+func (u *DBUserRepository) GetUserByID(id uint) (*models.User, error) {
+	var user models.User
+	err := u.db.First(&user, id).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
