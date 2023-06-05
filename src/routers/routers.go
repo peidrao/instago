@@ -2,13 +2,19 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/controllers"
+	"github.com/peidrao/instago/src/handler"
+	"github.com/peidrao/instago/src/repository"
+	"gorm.io/gorm"
 )
 
-func SetupRouter() *gin.Engine {
+func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
+
+	userRepo := repository.NewUserRepository(db)
+	userHandler := handler.NewUserHandler(userRepo)
+
 	api := router.Group("/api")
 
-	api.POST("user/register", controllers.RegisterUser)
+	api.POST("user/register", userHandler.RegisterUser)
 	return router
 }
