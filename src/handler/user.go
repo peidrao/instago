@@ -2,8 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -45,10 +45,8 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 
 	user.Password, _ = utils.HashPassword(user.Password)
 	user.Active = true
-	log.Println("\n\n\n", user)
 
 	err = h.userRepo.CreateUser(&user)
-	// record := database.Instance.Create(&user)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -76,5 +74,18 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusAccepted, user)
+}
 
+func (h *UserHandler) RemoveUser(context *gin.Context) {
+	id := context.Param("id")
+
+	userID, _ := strconv.ParseUint(id, 10, 64)
+
+	err := h.userRepo.RemoveUser(userID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }

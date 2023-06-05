@@ -8,6 +8,7 @@ import (
 type UserRepository interface {
 	CreateUser(user *models.User) error
 	GetUserByID(id uint) (*models.User, error)
+	RemoveUser(id uint64) error
 }
 
 type DBUserRepository struct {
@@ -35,4 +36,12 @@ func (u *DBUserRepository) GetUserByID(id uint) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (u *DBUserRepository) RemoveUser(userID uint64) error {
+	err := u.db.Delete(&models.User{}, userID).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
