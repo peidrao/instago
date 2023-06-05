@@ -8,7 +8,9 @@ import (
 
 func main() {
 	godotenv.Load()
-	database.ConnectDB()
-	router := routers.SetupRouter()
+
+	db := database.Init()
+
+	router := routers.SetupRouter(db)
 	router.Run(":8080")
 }
