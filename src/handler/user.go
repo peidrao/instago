@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -45,10 +44,8 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 
 	user.Password, _ = utils.HashPassword(user.Password)
 	user.Active = true
-	log.Println("\n\n\n", user)
 
 	err = h.userRepo.CreateUser(&user)
-	// record := database.Instance.Create(&user)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
