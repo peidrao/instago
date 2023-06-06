@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +27,7 @@ func setupDatabaseConnction() *gorm.DB {
 	return db
 }
 
-func TestRegisterUSer(t *testing.T) {
+func TestHandlerUser(t *testing.T) {
 	router := gin.Default()
 	db := setupDatabaseConnction()
 
@@ -58,6 +59,32 @@ func TestRegisterUSer(t *testing.T) {
 		router.ServeHTTP(resp, req)
 
 		assert.Equal(t, http.StatusCreated, resp.Code)
+		assert.Equal(t, `{"message":"User created successfully"}`, resp.Body.String())
+	})
 
+	t.Run("Should get a user by id", func(t *testing.T) {
+		user := models.User{
+			Username: "teste1",
+			Email:    "teste1@test.com",
+			Password: "@Teste123",
+			FullName: "Test One",
+		}
+
+		err := userRepo.CreateUser(&user)
+		assert.NoError(t, err)
+
+		lastUser, err := userRepo.LastUser()
+		assert.NoError(t, err)
+
+		router.GET("users/:id", userHandler.GetUser)
+
+		req, err := http.NewRequest("GET", "users/"+strconv.FormatUint(uint64(lastUser.ID), 10), nil)
+		assert.NoError(t, err)
+
+		resp := httptest.NewRecorder()
+
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusOK, resp.Code)
 	})
 }
