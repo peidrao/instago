@@ -9,6 +9,7 @@ type UserRepository interface {
 	CreateUser(user *models.User) error
 	GetUserByID(id uint) (*models.User, error)
 	RemoveUser(id uint64) error
+	LastUser() (*models.User, error)
 }
 
 type DBUserRepository struct {
@@ -44,4 +45,17 @@ func (u *DBUserRepository) RemoveUser(userID uint64) error {
 		return err
 	}
 	return nil
+}
+
+func (u *DBUserRepository) LastUser() (*models.User, error) {
+	var user models.User
+
+	err := u.db.Last(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+
 }

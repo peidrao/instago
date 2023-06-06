@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -67,13 +68,17 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 		return
 	}
 
+	log.Print("\n\n\nOI")
+	log.Print(userID)
+	log.Print("\n\n\n")
+
 	user, err := h.userRepo.GetUserByID(userID)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
-	context.JSON(http.StatusAccepted, user)
+	context.JSON(http.StatusOK, user)
 }
 
 func (h *UserHandler) RemoveUser(context *gin.Context) {
