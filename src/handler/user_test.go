@@ -73,7 +73,7 @@ func TestHandlerUser(t *testing.T) {
 		err := userRepo.CreateUser(&user)
 		assert.NoError(t, err)
 
-		lastUser, err := userRepo.LastUser()
+		lastUser, err := userRepo.FindLastUser()
 		assert.NoError(t, err)
 
 		router.GET("users/:id", userHandler.GetUser)

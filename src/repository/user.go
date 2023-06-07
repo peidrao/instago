@@ -7,9 +7,11 @@ import (
 
 type UserRepository interface {
 	CreateUser(user *models.User) error
-	GetUserByID(id uint) (*models.User, error)
-	RemoveUser(id uint64) error
-	LastUser() (*models.User, error)
+	FindUserByID(id uint64) (*models.User, error)
+	FindUserByEmail(email string) (*models.User, error)
+	FindLastUser() (*models.User, error)
+	DestroyUser(id uint64) error
+	UpdateUser(*models.User) (*models.User, error)
 }
 
 type DBUserRepository struct {
@@ -29,7 +31,7 @@ func (u *DBUserRepository) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (u *DBUserRepository) GetUserByID(id uint) (*models.User, error) {
+func (u *DBUserRepository) FindUserByID(id uint64) (*models.User, error) {
 	var user models.User
 	err := u.db.First(&user, id).Error
 
@@ -39,7 +41,17 @@ func (u *DBUserRepository) GetUserByID(id uint) (*models.User, error) {
 	return &user, nil
 }
 
-func (u *DBUserRepository) RemoveUser(userID uint64) error {
+func (u *DBUserRepository) FindUserByEmail(email string) (*models.User, error) {
+	var user models.User
+	err := u.db.Where("email = ?", email).First(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (u *DBUserRepository) DestroyUser(userID uint64) error {
 	err := u.db.Delete(&models.User{}, userID).Error
 	if err != nil {
 		return err
@@ -47,7 +59,7 @@ func (u *DBUserRepository) RemoveUser(userID uint64) error {
 	return nil
 }
 
-func (u *DBUserRepository) LastUser() (*models.User, error) {
+func (u *DBUserRepository) FindLastUser() (*models.User, error) {
 	var user models.User
 
 	err := u.db.Last(&user).Error
@@ -57,5 +69,13 @@ func (u *DBUserRepository) LastUser() (*models.User, error) {
 	}
 
 	return &user, nil
+}
 
+func (u *DBUserRepository) UpdateUser(user *models.User) (*models.User, error) {
+	err := u.db.Save(user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
