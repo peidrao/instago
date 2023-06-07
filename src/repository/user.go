@@ -43,6 +43,16 @@ func (u *DBUserRepository) FindUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
+func (u *DBUserRepository) FindUserByUsername(username string) (*models.User, error) {
+	var user models.User
+	err := u.db.Where("username = ?", username).First(&user).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 func (u *DBUserRepository) ListAllUsers() ([]*models.User, error) {
 	var users []*models.User
 	err := u.db.Find(&users).Error
