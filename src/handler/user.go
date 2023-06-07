@@ -2,23 +2,23 @@ package handler
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/peidrao/instago/src/domain/interfaces"
 	"github.com/peidrao/instago/src/domain/models"
-	"github.com/peidrao/instago/src/repository"
 
 	"github.com/peidrao/instago/src/utils"
 )
 
 type UserHandler struct {
-	userRepo repository.UserRepository
+	userRepo interfaces.UserRepository
 }
 
-func NewUserHandler(userRepo repository.UserRepository) *UserHandler {
+func NewUserHandler(userRepo interfaces.UserRepository) *UserHandler {
 	return &UserHandler{
 		userRepo: userRepo,
 	}
@@ -44,6 +44,14 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 		}
 	}
 
+	_, errFindEmail := h.userRepo.FindUserByEmail(user.Email)
+
+	if errFindEmail == nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "This email already exists for a user"})
+		context.Abort()
+		return
+	}
+
 	user.Password, _ = utils.HashPassword(user.Password)
 	user.Active = true
 
@@ -61,18 +69,14 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 func (h *UserHandler) GetUser(context *gin.Context) {
 	id := context.Param("id")
 
-	var userID uint
+	var userID uint64
 
 	if _, err := fmt.Sscan(id, &userID); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
 		return
 	}
 
-	log.Print("\n\n\nOI")
-	log.Print(userID)
-	log.Print("\n\n\n")
-
-	user, err := h.userRepo.GetUserByID(userID)
+	user, err := h.userRepo.FindUserByID(userID)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -81,12 +85,32 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 	context.JSON(http.StatusOK, user)
 }
 
+func (h *UserHandler) GetAllUsers(context *gin.Context) {
+
+	users, err := h.userRepo.ListAllUsers()
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	context.JSON(http.StatusOK, users)
+}
+
 func (h *UserHandler) RemoveUser(context *gin.Context) {
 	id := context.Param("id")
 
 	userID, _ := strconv.ParseUint(id, 10, 64)
 
-	err := h.userRepo.RemoveUser(userID)
+	user, err := h.userRepo.FindUserByID(userID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	user.Active = false
+	user.UpdatedAt = time.Now()
+
+	_, err = h.userRepo.UpdateUser(user)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
