@@ -1,24 +1,16 @@
 package repository
 
 import (
+	"github.com/peidrao/instago/src/domain/interfaces"
 	"github.com/peidrao/instago/src/domain/models"
 	"gorm.io/gorm"
 )
-
-type UserRepository interface {
-	CreateUser(user *models.User) error
-	FindUserByID(id uint64) (*models.User, error)
-	FindUserByEmail(email string) (*models.User, error)
-	FindLastUser() (*models.User, error)
-	DestroyUser(id uint64) error
-	UpdateUser(*models.User) (*models.User, error)
-}
 
 type DBUserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
+func NewUserRepository(db *gorm.DB) interfaces.UserRepository {
 	return &DBUserRepository{db}
 }
 
@@ -49,6 +41,17 @@ func (u *DBUserRepository) FindUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (u *DBUserRepository) ListAllUsers() ([]*models.User, error) {
+	var users []*models.User
+	err := u.db.Find(&users).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
 
 func (u *DBUserRepository) DestroyUser(userID uint64) error {

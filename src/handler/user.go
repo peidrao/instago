@@ -8,17 +8,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/peidrao/instago/src/domain/interfaces"
 	"github.com/peidrao/instago/src/domain/models"
-	"github.com/peidrao/instago/src/repository"
 
 	"github.com/peidrao/instago/src/utils"
 )
 
 type UserHandler struct {
-	userRepo repository.UserRepository
+	userRepo interfaces.UserRepository
 }
 
-func NewUserHandler(userRepo repository.UserRepository) *UserHandler {
+func NewUserHandler(userRepo interfaces.UserRepository) *UserHandler {
 	return &UserHandler{
 		userRepo: userRepo,
 	}
@@ -85,6 +85,17 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 	context.JSON(http.StatusOK, user)
 }
 
+func (h *UserHandler) GetAllUsers(context *gin.Context) {
+
+	users, err := h.userRepo.ListAllUsers()
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	context.JSON(http.StatusOK, users)
+}
+
 func (h *UserHandler) RemoveUser(context *gin.Context) {
 	id := context.Param("id")
 
@@ -99,7 +110,7 @@ func (h *UserHandler) RemoveUser(context *gin.Context) {
 	user.Active = false
 	user.UpdatedAt = time.Now()
 
-	user, err = h.userRepo.UpdateUser(user)
+	_, err = h.userRepo.UpdateUser(user)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 		return
