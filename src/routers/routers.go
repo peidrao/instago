@@ -3,7 +3,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/src/handler"
-	"github.com/peidrao/instago/src/internal/delivery/middlewares"
+	"github.com/peidrao/instago/src/internal/app/delivery/middlewares"
 	"github.com/peidrao/instago/src/repository"
 	"gorm.io/gorm"
 )
