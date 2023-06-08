@@ -17,7 +17,7 @@ type User struct {
 	Bio       string `json:"bio" gorm:"null"`
 	IsActive  bool   `json:"active" gorm:"default:true"`
 	IsPrivate bool   `json:"private" gorm:"default:false"`
-	IsAdmin   string `json:"admin" gorm:"default:false"`
+	IsAdmin   bool   `json:"admin" gorm:"default:false"`
 	Link      string `json:"link" gorm:"null"`
 
 	ProfilePicture string `json:"profile_picture" gorm:"null"`
