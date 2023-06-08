@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -53,7 +54,6 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 	}
 
 	user.Password, _ = utils.HashPassword(user.Password)
-	user.Active = true
 
 	err = h.userRepo.CreateUser(&user)
 
@@ -86,6 +86,9 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 }
 
 func (h *UserHandler) GetAllUsers(context *gin.Context) {
+	value, exist := context.Get("logged_in")
+
+	log.Println(value, exist)
 
 	users, err := h.userRepo.ListAllUsers()
 
@@ -107,7 +110,7 @@ func (h *UserHandler) RemoveUser(context *gin.Context) {
 		return
 	}
 
-	user.Active = false
+	user.IsActive = false
 	user.UpdatedAt = time.Now()
 
 	_, err = h.userRepo.UpdateUser(user)
