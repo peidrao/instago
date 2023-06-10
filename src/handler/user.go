@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -67,16 +66,9 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 }
 
 func (h *UserHandler) GetUser(context *gin.Context) {
-	id := context.Param("id")
+	username := context.Param("username")
 
-	var userID uint64
-
-	if _, err := fmt.Sscan(id, &userID); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
-		return
-	}
-
-	user, err := h.userRepo.FindUserByID(userID)
+	user, err := h.userRepo.FindUserByUsername(username)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return

@@ -25,7 +25,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.GET("users/", userHandler.GetAllUsers)
 	api.Use(middlewares.IsAdminUser())
 
-	api.GET("users/:id", userHandler.GetUser)
+	api.GET("users/:username", userHandler.GetUser)
 	api.DELETE("users/:id", userHandler.RemoveUser)
 
 	return router
