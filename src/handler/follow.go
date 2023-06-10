@@ -50,23 +50,23 @@ func (h *UserHandler) GetFollowers(context *gin.Context) {
 		response = append(response, follow)
 	}
 
-	context.JSON(http.StatusOK, followers)
+	context.JSON(http.StatusOK, response)
 
 }
 
-func (h *UserHandler) GetFollowings(context *gin.Context) {
+func (h *UserHandler) GetFollowing(context *gin.Context) {
 	username := context.Param("username")
 	var response []responses.FollowUserResponse
 
-	followings, err := h.userRepo.FindFollowings(username)
+	following, err := h.userRepo.FindFollowing(username)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followings"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve following"})
 		context.Abort()
 		return
 	}
 
-	for _, following := range followings {
+	for _, following := range following {
 		follow := responses.FollowUserResponse{
 			ID:       following.ID,
 			Username: following.Username,

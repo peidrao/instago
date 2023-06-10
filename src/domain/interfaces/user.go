@@ -14,5 +14,5 @@ type UserInterface interface {
 
 	FollowUser(userId, followerID uint) error
 	FindFollowers(username string) ([]*models.User, error)
-	FindFollowings(username string) ([]*models.User, error)
+	FindFollowing(username string) ([]*models.User, error)
 }
