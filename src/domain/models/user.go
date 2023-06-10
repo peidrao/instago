@@ -22,8 +22,10 @@ type User struct {
 
 	ProfilePicture string `json:"profile_picture" gorm:"null"`
 	// Posts          []Post
-	Followers []User    `gorm:"many2many:user_followers;joinForeignKey:follower_id;joinReferences:user_id"`
-	Following []User    `gorm:"many2many:user_following;joinForeignKey:user_id;joinReferences:follower_id"`
+
+	Followers []*User `gorm:"many2many:user_followers;joinForeignKey:follower_id;joinReferences:followed_id"`
+	Following []*User `gorm:"many2many:user_followers;joinForeignKey:followed_id;joinReferences:follower_id"`
+
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
@@ -31,6 +33,11 @@ type User struct {
 type Credentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type FolloweUserRequest struct {
+	UserID   uint `json:"user_id"`
+	FollowID uint `json:"follow_id"`
 }
 
 func StrongPasswordValidator(f1 validator.FieldLevel) bool {

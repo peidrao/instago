@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,10 +14,10 @@ import (
 )
 
 type UserHandler struct {
-	userRepo interfaces.UserRepository
+	userRepo interfaces.UserInterface
 }
 
-func NewUserHandler(userRepo interfaces.UserRepository) *UserHandler {
+func NewUserHandler(userRepo interfaces.UserInterface) *UserHandler {
 	return &UserHandler{
 		userRepo: userRepo,
 	}
@@ -67,16 +65,9 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 }
 
 func (h *UserHandler) GetUser(context *gin.Context) {
-	id := context.Param("id")
+	username := context.Param("username")
 
-	var userID uint64
-
-	if _, err := fmt.Sscan(id, &userID); err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "invalid ID"})
-		return
-	}
-
-	user, err := h.userRepo.FindUserByID(userID)
+	user, err := h.userRepo.FindUserByUsername(username)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
@@ -100,24 +91,24 @@ func (h *UserHandler) GetAllUsers(context *gin.Context) {
 }
 
 func (h *UserHandler) RemoveUser(context *gin.Context) {
-	id := context.Param("id")
+	userContext, exists := context.Get("user")
 
-	userID, _ := strconv.ParseUint(id, 10, 64)
-
-	user, err := h.userRepo.FindUserByID(userID)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+	if !exists {
+		context.JSON(http.StatusNotFound, gin.H{"error": "user not found in database"})
+		context.Abort()
 		return
 	}
 
-	user.IsActive = false
-	user.UpdatedAt = time.Now()
+	if user, ok := userContext.(*models.User); ok {
+		user.IsActive = false
+		user.UpdatedAt = time.Now()
 
-	_, err = h.userRepo.UpdateUser(user)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
-		return
+		_, err := h.userRepo.UpdateUser(user)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	}
-
-	context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
