@@ -10,7 +10,7 @@ type DBUserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) interfaces.UserRepository {
+func NewUserRepository(db *gorm.DB) interfaces.UserInterface {
 	return &DBUserRepository{db}
 }
 
@@ -23,7 +23,7 @@ func (u *DBUserRepository) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (u *DBUserRepository) FindUserByID(id uint64) (*models.User, error) {
+func (u *DBUserRepository) FindUserByID(id uint) (*models.User, error) {
 	var user models.User
 	err := u.db.First(&user, id).Error
 
@@ -91,4 +91,46 @@ func (u *DBUserRepository) UpdateUser(user *models.User) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (u *DBUserRepository) FollowUser(userID, followerID uint) error {
+
+	follower, err := u.FindUserByID(userID)
+
+	if err != nil {
+		return err
+	}
+
+	followed, err := u.FindUserByID(followerID)
+	if err != nil {
+		return err
+	}
+
+	follower.Following = append(follower.Following, followed)
+
+	_, err = u.UpdateUser(follower)
+
+	return err
+}
+
+func (u *DBUserRepository) FindFollowers(username string) ([]*models.User, error) {
+	var user models.User
+	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user.Followers, nil
+}
+
+func (u *DBUserRepository) FindFollowings(username string) ([]*models.User, error) {
+	var user models.User
+	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return user.Following, nil
 }
