@@ -4,11 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/src/domain/requests"
+	"github.com/peidrao/instago/src/domain/responses"
 )
 
 func (h *UserHandler) FollowUser(context *gin.Context) {
-	var request models.FolloweUserRequest
+	var request requests.FolloweUserRequest
 
 	if err := context.ShouldBindJSON(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -30,6 +31,7 @@ func (h *UserHandler) FollowUser(context *gin.Context) {
 
 func (h *UserHandler) GetFollowers(context *gin.Context) {
 	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
 	followers, err := h.userRepo.FindFollowers(username)
 
@@ -39,14 +41,24 @@ func (h *UserHandler) GetFollowers(context *gin.Context) {
 		return
 	}
 
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+
 	context.JSON(http.StatusOK, followers)
 
 }
 
 func (h *UserHandler) GetFollowings(context *gin.Context) {
 	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
-	followers, err := h.userRepo.FindFollowings(username)
+	followings, err := h.userRepo.FindFollowings(username)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followings"})
@@ -54,6 +66,15 @@ func (h *UserHandler) GetFollowings(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, followers)
+	for _, following := range followings {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+
+	context.JSON(http.StatusOK, response)
 
 }
