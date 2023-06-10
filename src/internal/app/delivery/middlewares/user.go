@@ -7,7 +7,7 @@ import (
 	"github.com/peidrao/instago/src/domain/interfaces"
 )
 
-func SetUserMiddleware(userRepo interfaces.UserRepository) gin.HandlerFunc {
+func SetUserMiddleware(userRepo interfaces.UserInterface) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		username, _ := context.Get("username")
 

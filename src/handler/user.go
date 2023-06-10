@@ -14,10 +14,10 @@ import (
 )
 
 type UserHandler struct {
-	userRepo interfaces.UserRepository
+	userRepo interfaces.UserInterface
 }
 
-func NewUserHandler(userRepo interfaces.UserRepository) *UserHandler {
+func NewUserHandler(userRepo interfaces.UserInterface) *UserHandler {
 	return &UserHandler{
 		userRepo: userRepo,
 	}
@@ -111,5 +111,4 @@ func (h *UserHandler) RemoveUser(context *gin.Context) {
 
 		context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	}
-
 }
