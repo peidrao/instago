@@ -5,7 +5,7 @@ import (
 	"github.com/peidrao/instago/src/domain/models"
 )
 
-func IsUserAdmin(context *gin.Context) bool {
+func IsUserAdminPermission(context *gin.Context) bool {
 	user, exists := context.Get("user")
 	if exists {
 		if u, ok := user.(*models.User); ok {
