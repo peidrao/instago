@@ -30,16 +30,6 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type FolloweUserRequest struct {
-	UserID   uint `json:"user_id"`
-	FollowID uint `json:"follow_id"`
-}
-
 func StrongPasswordValidator(f1 validator.FieldLevel) bool {
 	password := f1.Field().String()
 	rules := []string{
