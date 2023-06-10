@@ -22,11 +22,11 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.Use(middlewares.AuthMiddleware())
 	api.Use(middlewares.SetUserMiddleware(userRepo))
 
-	api.GET("users/", userHandler.GetAllUsers)
+	api.DELETE("users/", userHandler.RemoveUser)
 	api.Use(middlewares.IsAdminUser())
 
 	api.GET("users/:username", userHandler.GetUser)
-	api.DELETE("users/:id", userHandler.RemoveUser)
+	api.GET("users/", userHandler.GetAllUsers)
 
 	return router
 }

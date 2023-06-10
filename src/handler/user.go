@@ -3,7 +3,6 @@ package handler
 import (
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -92,24 +91,25 @@ func (h *UserHandler) GetAllUsers(context *gin.Context) {
 }
 
 func (h *UserHandler) RemoveUser(context *gin.Context) {
-	id := context.Param("id")
+	userContext, exists := context.Get("user")
 
-	userID, _ := strconv.ParseUint(id, 10, 64)
-
-	user, err := h.userRepo.FindUserByID(userID)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+	if !exists {
+		context.JSON(http.StatusNotFound, gin.H{"error": "user not found in database"})
+		context.Abort()
 		return
 	}
 
-	user.IsActive = false
-	user.UpdatedAt = time.Now()
+	if user, ok := userContext.(*models.User); ok {
+		user.IsActive = false
+		user.UpdatedAt = time.Now()
 
-	_, err = h.userRepo.UpdateUser(user)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
-		return
+		_, err := h.userRepo.UpdateUser(user)
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	}
 
-	context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
