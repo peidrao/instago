@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/models"
-	"github.com/peidrao/instago/src/handler"
-	"github.com/peidrao/instago/src/repository"
+	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/api/handler"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -23,7 +23,7 @@ func setupDatabaseConnction() *gorm.DB {
 	if err != nil {
 		panic("failed to connect to database: " + err.Error())
 	}
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&entity.User{})
 	return db
 }
 
@@ -35,7 +35,7 @@ func TestHandlerUser(t *testing.T) {
 	userHandler := handler.NewUserHandler(userRepo)
 
 	t.Run("Should register a new user", func(t *testing.T) {
-		user := models.User{
+		user := entity.User{
 			Username: "teste",
 			Email:    "teste@test.com",
 			Password: "@Teste123",
@@ -63,7 +63,7 @@ func TestHandlerUser(t *testing.T) {
 	})
 
 	t.Run("Should get a user by id", func(t *testing.T) {
-		user := models.User{
+		user := entity.User{
 			Username: "teste1",
 			Email:    "teste1@test.com",
 			Password: "@Teste123",

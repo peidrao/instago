@@ -1,11 +1,11 @@
 package serializers
 
 import (
-	"github.com/peidrao/instago/src/domain/models"
-	"github.com/peidrao/instago/src/domain/responses"
+	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
-func UserDetailSerializer(user *models.User, followers, following uint) *responses.UserDetailResponse {
+func UserDetailSerializer(user *entity.User, followers, following uint) *responses.UserDetailResponse {
 
 	return &responses.UserDetailResponse{
 		Username: user.Username,

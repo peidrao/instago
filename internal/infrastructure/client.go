@@ -1,10 +1,10 @@
-package database
+package infrastructure
 
 import (
 	"log"
 	"os"
 
-	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/internal/domain/entity"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -20,7 +20,7 @@ func Init() *gorm.DB {
 
 	log.Println("Connected to database")
 
-	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&entity.User{})
 
 	return db
 }

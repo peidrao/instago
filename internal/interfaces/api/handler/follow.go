@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/requests"
-	"github.com/peidrao/instago/src/domain/responses"
+	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
 func (h *UserHandler) FollowUser(context *gin.Context) {

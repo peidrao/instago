@@ -6,8 +6,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/peidrao/instago/src/internal/app/permissions"
-	"github.com/peidrao/instago/src/utils"
+	"github.com/peidrao/instago/internal/interfaces/api/permissions"
+	"github.com/peidrao/instago/utils"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
@@ -47,7 +47,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-		
+
 		context.Set("username", username)
 		context.Next()
 	}
