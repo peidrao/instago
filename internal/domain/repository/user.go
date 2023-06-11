@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"github.com/peidrao/instago/src/domain/interfaces"
-	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/internal/domain/entity"
 	"gorm.io/gorm"
 )
 
@@ -10,11 +9,11 @@ type DBUserRepository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) interfaces.UserInterface {
+func NewUserRepository(db *gorm.DB) entity.UserInterface {
 	return &DBUserRepository{db}
 }
 
-func (u *DBUserRepository) CreateUser(user *models.User) error {
+func (u *DBUserRepository) CreateUser(user *entity.User) error {
 	err := u.db.Create(&user).Error
 
 	if err != nil {
@@ -23,8 +22,8 @@ func (u *DBUserRepository) CreateUser(user *models.User) error {
 	return nil
 }
 
-func (u *DBUserRepository) FindUserByID(id uint) (*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindUserByID(id uint) (*entity.User, error) {
+	var user entity.User
 	err := u.db.First(&user, id).Error
 
 	if err != nil {
@@ -33,8 +32,8 @@ func (u *DBUserRepository) FindUserByID(id uint) (*models.User, error) {
 	return &user, nil
 }
 
-func (u *DBUserRepository) FindUserByEmail(email string) (*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindUserByEmail(email string) (*entity.User, error) {
+	var user entity.User
 	err := u.db.Where("email = ?", email).First(&user).Error
 
 	if err != nil {
@@ -43,8 +42,8 @@ func (u *DBUserRepository) FindUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-func (u *DBUserRepository) FindUserByUsername(username string) (*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindUserByUsername(username string) (*entity.User, error) {
+	var user entity.User
 	err := u.db.Where("username = ?", username).First(&user).Error
 
 	if err != nil {
@@ -53,8 +52,8 @@ func (u *DBUserRepository) FindUserByUsername(username string) (*models.User, er
 	return &user, nil
 }
 
-func (u *DBUserRepository) ListAllUsers() ([]*models.User, error) {
-	var users []*models.User
+func (u *DBUserRepository) ListAllUsers() ([]*entity.User, error) {
+	var users []*entity.User
 	err := u.db.Find(&users).Error
 
 	if err != nil {
@@ -65,15 +64,15 @@ func (u *DBUserRepository) ListAllUsers() ([]*models.User, error) {
 }
 
 func (u *DBUserRepository) DestroyUser(userID uint64) error {
-	err := u.db.Delete(&models.User{}, userID).Error
+	err := u.db.Delete(&entity.User{}, userID).Error
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *DBUserRepository) FindLastUser() (*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindLastUser() (*entity.User, error) {
+	var user entity.User
 
 	err := u.db.Last(&user).Error
 
@@ -84,7 +83,7 @@ func (u *DBUserRepository) FindLastUser() (*models.User, error) {
 	return &user, nil
 }
 
-func (u *DBUserRepository) UpdateUser(user *models.User) (*models.User, error) {
+func (u *DBUserRepository) UpdateUser(user *entity.User) (*entity.User, error) {
 	err := u.db.Save(user).Error
 	if err != nil {
 		return nil, err
@@ -113,8 +112,8 @@ func (u *DBUserRepository) FollowUser(userID, followerID uint) error {
 	return err
 }
 
-func (u *DBUserRepository) FindFollowers(username string) ([]*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindFollowers(username string) ([]*entity.User, error) {
+	var user entity.User
 	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
 
 	if result.Error != nil {
@@ -124,8 +123,8 @@ func (u *DBUserRepository) FindFollowers(username string) ([]*models.User, error
 	return user.Followers, nil
 }
 
-func (u *DBUserRepository) FindFollowing(username string) ([]*models.User, error) {
-	var user models.User
+func (u *DBUserRepository) FindFollowing(username string) ([]*entity.User, error) {
+	var user entity.User
 	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
 
 	if result.Error != nil {

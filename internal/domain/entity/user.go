@@ -1,4 +1,4 @@
-package models
+package entity
 
 import (
 	"regexp"
@@ -54,4 +54,19 @@ func NewValidator() *validator.Validate {
 	validate := validator.New()
 	validate.RegisterValidation("strongPassword", StrongPasswordValidator)
 	return validate
+}
+
+type UserInterface interface {
+	CreateUser(user *User) error
+	FindUserByID(id uint) (*User, error)
+	FindUserByEmail(email string) (*User, error)
+	FindUserByUsername(username string) (*User, error)
+	FindLastUser() (*User, error)
+	ListAllUsers() ([]*User, error)
+	DestroyUser(id uint64) error
+	UpdateUser(*User) (*User, error)
+
+	FollowUser(userId, followerID uint) error
+	FindFollowers(username string) ([]*User, error)
+	FindFollowing(username string) ([]*User, error)
 }

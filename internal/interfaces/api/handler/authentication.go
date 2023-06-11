@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/requests"
-	"github.com/peidrao/instago/src/utils"
+	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/utils"
 )
 
 func (h *UserHandler) LoginHandler(context *gin.Context) {

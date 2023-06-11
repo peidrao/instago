@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/interfaces"
+	"github.com/peidrao/instago/internal/domain/entity"
 )
 
-func SetUserMiddleware(userRepo interfaces.UserInterface) gin.HandlerFunc {
+func SetUserMiddleware(userRepo entity.UserInterface) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		username, _ := context.Get("username")
 

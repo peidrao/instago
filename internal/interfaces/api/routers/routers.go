@@ -2,9 +2,9 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/handler"
-	"github.com/peidrao/instago/src/internal/app/delivery/middlewares"
-	"github.com/peidrao/instago/src/repository"
+	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/api/handler"
+	"github.com/peidrao/instago/internal/interfaces/api/middlewares"
 	"gorm.io/gorm"
 )
 

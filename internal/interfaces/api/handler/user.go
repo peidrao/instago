@@ -6,18 +6,16 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"github.com/peidrao/instago/src/domain/interfaces"
-	"github.com/peidrao/instago/src/domain/models"
-	"github.com/peidrao/instago/src/serializers"
-
-	"github.com/peidrao/instago/src/utils"
+	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/interfaces/api/serializers"
+	"github.com/peidrao/instago/utils"
 )
 
 type UserHandler struct {
-	userRepo interfaces.UserInterface
+	userRepo entity.UserInterface
 }
 
-func NewUserHandler(userRepo interfaces.UserInterface) *UserHandler {
+func NewUserHandler(userRepo entity.UserInterface) *UserHandler {
 	return &UserHandler{
 		userRepo: userRepo,
 	}
@@ -25,14 +23,14 @@ func NewUserHandler(userRepo interfaces.UserInterface) *UserHandler {
 
 func (h *UserHandler) RegisterUser(context *gin.Context) {
 
-	var user models.User
+	var user entity.User
 
 	if err := context.ShouldBindJSON(&user); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
-	validate := models.NewValidator()
+	validate := entity.NewValidator()
 
 	err := validate.Struct(user)
 	if err != nil {
@@ -104,7 +102,7 @@ func (h *UserHandler) RemoveUser(context *gin.Context) {
 		return
 	}
 
-	if user, ok := userContext.(*models.User); ok {
+	if user, ok := userContext.(*entity.User); ok {
 		user.IsActive = false
 		user.UpdatedAt = time.Now()
 
