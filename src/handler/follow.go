@@ -4,11 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/src/domain/requests"
+	"github.com/peidrao/instago/src/domain/responses"
 )
 
 func (h *UserHandler) FollowUser(context *gin.Context) {
-	var request models.FolloweUserRequest
+	var request requests.FolloweUserRequest
 
 	if err := context.ShouldBindJSON(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -30,6 +31,7 @@ func (h *UserHandler) FollowUser(context *gin.Context) {
 
 func (h *UserHandler) GetFollowers(context *gin.Context) {
 	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
 	followers, err := h.userRepo.FindFollowers(username)
 
@@ -39,21 +41,40 @@ func (h *UserHandler) GetFollowers(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, followers)
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+
+	context.JSON(http.StatusOK, response)
 
 }
 
-func (h *UserHandler) GetFollowings(context *gin.Context) {
+func (h *UserHandler) GetFollowing(context *gin.Context) {
 	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
-	followers, err := h.userRepo.FindFollowings(username)
+	following, err := h.userRepo.FindFollowing(username)
 
 	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followings"})
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve following"})
 		context.Abort()
 		return
 	}
 
-	context.JSON(http.StatusOK, followers)
+	for _, following := range following {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+
+	context.JSON(http.StatusOK, response)
 
 }

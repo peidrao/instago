@@ -124,7 +124,7 @@ func (u *DBUserRepository) FindFollowers(username string) ([]*models.User, error
 	return user.Followers, nil
 }
 
-func (u *DBUserRepository) FindFollowings(username string) ([]*models.User, error) {
+func (u *DBUserRepository) FindFollowing(username string) ([]*models.User, error) {
 	var user models.User
 	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
 

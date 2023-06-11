@@ -4,12 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/src/domain/requests"
 	"github.com/peidrao/instago/src/utils"
 )
 
 func (h *UserHandler) LoginHandler(context *gin.Context) {
-	var credentials models.Credentials
+	var credentials requests.CredentialsRequest
 
 	if err := context.ShouldBindJSON(&credentials); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

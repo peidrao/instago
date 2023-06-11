@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -9,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/peidrao/instago/src/domain/interfaces"
 	"github.com/peidrao/instago/src/domain/models"
+	"github.com/peidrao/instago/src/serializers"
 
 	"github.com/peidrao/instago/src/utils"
 )
@@ -73,14 +73,19 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, user)
+	followers, _ := h.userRepo.FindFollowers(username)
+	following, _ := h.userRepo.FindFollowing(username)
+
+	response := serializers.UserDetailSerializer(
+		user,
+		uint(len(followers)),
+		uint(len(following)),
+	)
+
+	context.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) GetAllUsers(context *gin.Context) {
-	value, exist := context.Get("logged_in")
-
-	log.Println(value, exist)
-
 	users, err := h.userRepo.ListAllUsers()
 
 	if err != nil {
