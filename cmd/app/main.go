@@ -2,14 +2,14 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/peidrao/instago/src/database"
-	"github.com/peidrao/instago/src/routers"
+	"github.com/peidrao/instago/internal/infrastructure"
+	"github.com/peidrao/instago/internal/interfaces/api/routers"
 )
 
 func main() {
 	godotenv.Load()
 
-	db := database.Init()
+	db := infrastructure.Init()
 
 	router := routers.SetupRouter(db)
 	router.Run(":8080")
