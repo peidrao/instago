@@ -8,4 +8,4 @@ psql.exclude:
 	docker rm instago_db_1
 
 run:
-	go run main.go
+	go run cmd/app/main.go
