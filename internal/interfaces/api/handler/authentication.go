@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
 	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/utils"
 )
