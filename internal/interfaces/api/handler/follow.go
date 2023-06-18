@@ -69,6 +69,10 @@ func (h *UserHandler) GetFollowers(context *gin.Context) {
 		response = append(response, follow)
 	}
 
+	if len(followers) == 0 {
+		response = make([]responses.FollowUserResponse, 0)
+	}
+
 	context.JSON(http.StatusOK, response)
 }
 
