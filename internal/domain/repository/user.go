@@ -112,6 +112,16 @@ func (u *DBUserRepository) FollowUser(userID, followerID uint) error {
 	return err
 }
 
+func (u *DBUserRepository) UnFollowUser(userID, unfollowerID uint) error {
+	result := u.db.Exec("DELETE FROM user_followers WHERE follower_id = ? and followed_id = ?", unfollowerID, userID)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
 func (u *DBUserRepository) FindFollowers(username string) ([]*entity.User, error) {
 	var user entity.User
 	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
