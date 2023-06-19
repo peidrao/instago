@@ -4,12 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/peidrao/instago/internal/domain/entity"
 	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
 func (h *UserHandler) FollowUser(context *gin.Context) {
 	var request requests.FolloweUserRequest
+	user, _ := context.Get("user")
+
+	userObj, _ := user.(*entity.User)
 
 	if err := context.ShouldBindJSON(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
@@ -17,7 +21,7 @@ func (h *UserHandler) FollowUser(context *gin.Context) {
 		return
 	}
 
-	err := h.userRepo.FollowUser(request.UserID, request.FollowID)
+	err := h.userRepo.FollowUser(userObj.ID, request.FollowID)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to follow user"})
@@ -26,6 +30,28 @@ func (h *UserHandler) FollowUser(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"message": "User following"})
+}
+
+func (h *UserHandler) UnfollowUser(context *gin.Context) {
+	var request requests.FolloweUserRequest
+	user, _ := context.Get("user")
+
+	userObj, _ := user.(*entity.User)
+
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		context.Abort()
+		return
+	}
+
+	err := h.userRepo.UnFollowUser(userObj.ID, request.FollowID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Follower removal successful."})
 
 }
 
@@ -50,8 +76,11 @@ func (h *UserHandler) GetFollowers(context *gin.Context) {
 		response = append(response, follow)
 	}
 
-	context.JSON(http.StatusOK, response)
+	if len(followers) == 0 {
+		response = make([]responses.FollowUserResponse, 0)
+	}
 
+	context.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) GetFollowing(context *gin.Context) {
@@ -76,5 +105,4 @@ func (h *UserHandler) GetFollowing(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, response)
-
 }

@@ -24,6 +24,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	api.DELETE("users/", userHandler.RemoveUser)
 	api.POST("follow/", userHandler.FollowUser)
+	api.POST("unfollow/", userHandler.UnfollowUser)
 	api.GET("followers/:username", userHandler.GetFollowers)
 	api.GET("followings/:username", userHandler.GetFollowing)
 	api.Use(middlewares.IsAdminUser())

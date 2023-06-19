@@ -6,6 +6,5 @@ type CredentialsRequest struct {
 }
 
 type FolloweUserRequest struct {
-	UserID   uint `json:"user_id"`
 	FollowID uint `json:"follow_id"`
 }

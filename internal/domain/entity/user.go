@@ -67,6 +67,7 @@ type UserInterface interface {
 	UpdateUser(*User) (*User, error)
 
 	FollowUser(userId, followerID uint) error
+	UnFollowUser(userId, unfollowerID uint) error
 	FindFollowers(username string) ([]*User, error)
 	FindFollowing(username string) ([]*User, error)
 }
