@@ -22,9 +22,8 @@ type User struct {
 
 	ProfilePicture string `json:"profile_picture" gorm:"null"`
 	// Posts          []Post
-
-	Followers []*User `gorm:"many2many:user_followers;joinForeignKey:follower_id;joinReferences:followed_id"`
-	Following []*User `gorm:"many2many:user_followers;joinForeignKey:followed_id;joinReferences:follower_id"`
+	Followers []Follow `gorm:"foreignKey:FollowerID"`
+	Following []Follow `gorm:"foreignKey:FollowingID"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
@@ -57,15 +56,6 @@ func NewValidator() *validator.Validate {
 }
 
 type UserInterface interface {
-	CreateUser(user *User) error
-	FindUserByID(id uint) (*User, error)
-	FindUserByEmail(email string) (*User, error)
-	FindUserByUsername(username string) (*User, error)
-	FindLastUser() (*User, error)
-	ListAllUsers() ([]*User, error)
-	DestroyUser(id uint64) error
-	UpdateUser(*User) (*User, error)
-
 	FollowUser(userId, followerID uint) error
 	UnFollowUser(userId, unfollowerID uint) error
 	FindFollowers(username string) ([]*User, error)
