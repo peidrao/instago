@@ -16,20 +16,21 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	api := router.Group("/api")
 
-	api.POST("users/", userHandler.RegisterUser)
+	api.POST("users/", userHandler.CreateUser)
+
 	api.POST("login/", userHandler.LoginHandler)
 
 	api.Use(middlewares.AuthMiddleware())
 	api.Use(middlewares.SetUserMiddleware(userRepo))
+	api.GET("users/:username", userHandler.GetUser)
 
-	api.DELETE("users/", userHandler.RemoveUser)
-	api.POST("follow/", userHandler.FollowUser)
-	api.POST("unfollow/", userHandler.UnfollowUser)
-	api.GET("followers/:username", userHandler.GetFollowers)
-	api.GET("followings/:username", userHandler.GetFollowing)
+	// api.DELETE("users/", userHandler.RemoveUser)
+	// api.POST("follow/", userHandler.FollowUser)
+	// api.POST("unfollow/", userHandler.UnfollowUser)
+	// api.GET("followers/:username", userHandler.GetFollowers)
+	// api.GET("followings/:username", userHandler.GetFollowing)
 	api.Use(middlewares.IsAdminUser())
 
-	api.GET("users/:username", userHandler.GetUser)
 	api.GET("users/", userHandler.GetAllUsers)
 
 	return router
