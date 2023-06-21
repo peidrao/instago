@@ -5,7 +5,7 @@ import (
 	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
-func UserDetailSerializer(user *entity.User, followers, following uint) *responses.UserDetailResponse {
+func UserDetailSerializer(user *entity.User) *responses.UserDetailResponse {
 
 	return &responses.UserDetailResponse{
 		Username: user.Username,
@@ -13,9 +13,8 @@ func UserDetailSerializer(user *entity.User, followers, following uint) *respons
 		Bio:      user.Bio,
 		Link:     user.Link,
 
-		Picture:   user.ProfilePicture,
-		Followers: followers,
-		Following: following,
+		Picture: user.ProfilePicture,
+
 		CreatedAt: user.CreatedAt,
 	}
 }

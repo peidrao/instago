@@ -4,16 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/domain/repository"
 )
 
-func SetUserMiddleware(userRepo entity.UserInterface) gin.HandlerFunc {
+func SetUserMiddleware(userRepository *repository.UserRepository) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		username, _ := context.Get("username")
 
 		str, ok := username.(string)
 		if ok {
-			user, err := userRepo.FindUserByUsername(str)
+			user, err := userRepository.FindUserByUsername(str)
 
 			if err != nil {
 				context.JSON(http.StatusNotFound, gin.H{"error": "username not found in database"})

@@ -7,21 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/api/serializers"
 	"github.com/peidrao/instago/utils"
 )
 
 type UserHandler struct {
-	userRepo entity.UserInterface
+	UserRepository *repository.UserRepository
 }
 
-func NewUserHandler(userRepo entity.UserInterface) *UserHandler {
+func NewUserHandler(userRepository *repository.UserRepository) *UserHandler {
 	return &UserHandler{
-		userRepo: userRepo,
+		UserRepository: userRepository,
 	}
 }
 
-func (h *UserHandler) RegisterUser(context *gin.Context) {
+func (h *UserHandler) CreateUser(context *gin.Context) {
 
 	var user entity.User
 
@@ -41,7 +42,7 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 		}
 	}
 
-	_, errFindEmail := h.userRepo.FindUserByEmail(user.Email)
+	_, errFindEmail := h.UserRepository.FindUserByEmail(user.Email)
 
 	if errFindEmail == nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "This email already exists for a user"})
@@ -51,7 +52,7 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 
 	user.Password, _ = utils.HashPassword(user.Password)
 
-	err = h.userRepo.CreateUser(&user)
+	err = h.UserRepository.CreateUser(&user)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
@@ -65,26 +66,26 @@ func (h *UserHandler) RegisterUser(context *gin.Context) {
 func (h *UserHandler) GetUser(context *gin.Context) {
 	username := context.Param("username")
 
-	user, err := h.userRepo.FindUserByUsername(username)
+	user, err := h.UserRepository.FindUserByUsername(username)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
-	followers, _ := h.userRepo.FindFollowers(username)
-	following, _ := h.userRepo.FindFollowing(username)
+	// followers, _ := h.userRepo.FindFollowers(username)
+	// following, _ := h.userRepo.FindFollowing(username)
 
 	response := serializers.UserDetailSerializer(
 		user,
-		uint(len(followers)),
-		uint(len(following)),
+		// uint(len(followers)),
+		// uint(len(following)),
 	)
 
 	context.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) GetAllUsers(context *gin.Context) {
-	users, err := h.userRepo.ListAllUsers()
+	users, err := h.UserRepository.FindAllUsers()
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -106,7 +107,7 @@ func (h *UserHandler) RemoveUser(context *gin.Context) {
 		user.IsActive = false
 		user.UpdatedAt = time.Now()
 
-		_, err := h.userRepo.UpdateUser(user)
+		_, err := h.UserRepository.UpdateUser(user, user.ID)
 		if err != nil {
 			context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
 			return

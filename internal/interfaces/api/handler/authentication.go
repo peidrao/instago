@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-
 	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/utils"
 )
@@ -17,7 +16,7 @@ func (h *UserHandler) LoginHandler(context *gin.Context) {
 		return
 	}
 
-	user, err := h.userRepo.FindUserByUsername(credentials.Username)
+	user, err := h.UserRepository.FindUserByUsername(credentials.Username)
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
