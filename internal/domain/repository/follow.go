@@ -1,5 +1,24 @@
 package repository
 
+import (
+	"github.com/peidrao/instago/internal/domain/entity"
+	"gorm.io/gorm"
+)
+
+type FollowRepository struct {
+	*GenericRepository
+}
+
+func NewFollowRepository(db *gorm.DB) *FollowRepository {
+	return &FollowRepository{
+		GenericRepository: NewRepository(db),
+	}
+}
+
+func (f *FollowRepository) CreateFollow(follow *entity.Follow) error {
+	return f.Create(follow)
+}
+
 // func (u *UserRepository) FollowUser(userID, followerID uint) error {
 
 // 	follower, err := u.FindUserByID(userID)

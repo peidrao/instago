@@ -14,6 +14,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	userRepo := repository.NewUserRepository(db)
 	userHandler := handler.NewUserHandler(userRepo)
 
+	followRepository := repository.NewFollowRepository(db)
+	followHandler := handler.NewFollowHandler(userRepo, followRepository)
+
 	api := router.Group("/api")
 
 	api.POST("users/", userHandler.CreateUser)
@@ -25,7 +28,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.GET("users/:username", userHandler.GetUser)
 
 	// api.DELETE("users/", userHandler.RemoveUser)
-	// api.POST("follow/", userHandler.FollowUser)
+	api.POST("follow/", followHandler.FollowUser)
 	// api.POST("unfollow/", userHandler.UnfollowUser)
 	// api.GET("followers/:username", userHandler.GetFollowers)
 	// api.GET("followings/:username", userHandler.GetFollowing)

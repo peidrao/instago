@@ -1,27 +1,71 @@
 package handler
 
-// func (h *UserHandler) FollowUser(context *gin.Context) {
-// 	var request requests.FolloweUserRequest
-// 	user, _ := context.Get("user")
+import (
+	"log"
+	"net/http"
 
-// 	userObj, _ := user.(*entity.User)
+	"github.com/gin-gonic/gin"
+	"github.com/peidrao/instago/internal/domain/entity"
+	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/requests"
+)
 
-// 	if err := context.ShouldBindJSON(&request); err != nil {
-// 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-// 		context.Abort()
-// 		return
-// 	}
+type FollowHandler struct {
+	FollowRepository *repository.FollowRepository
+	UserRepository   *repository.UserRepository
+}
 
-// 	err := h.userRepo.FollowUser(userObj.ID, request.FollowID)
+func NewFollowHandler(
+	userRepository *repository.UserRepository, followRepository *repository.FollowRepository) *FollowHandler {
+	return &FollowHandler{
+		FollowRepository: followRepository,
+		UserRepository:   userRepository,
+	}
+}
+func (f *FollowHandler) FollowUser(context *gin.Context) {
+	var request requests.FolloweUserRequest
+	var newFollow entity.Follow
+	user, _ := context.Get("user")
 
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to follow user"})
-// 		context.Abort()
-// 		return
-// 	}
+	userObj, _ := user.(*entity.User)
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+	log.Println("PASSEI AQUI 1")
+	log.Println("FOLLOW -> ", request.FollowID)
 
-// 	context.JSON(http.StatusOK, gin.H{"message": "User following"})
-// }
+	followUser, err := f.UserRepository.FindUserByID(request.FollowID)
+	log.Println("FOLLOW -> ", followUser)
+
+	if err != nil {
+		// Melhor request
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+	log.Println("PASSEI AQUI 2")
+
+	if followUser.IsPrivate {
+		newFollow.IsPrivate = true
+	}
+
+	newFollow.FollowerID = userObj.ID
+	newFollow.FollowingID = followUser.ID
+
+	err = f.FollowRepository.CreateFollow(&newFollow)
+	log.Println("PASSEI AQUI 3")
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to follow user"})
+		context.Abort()
+		return
+	}
+	log.Println("PASSEI AQUI 4")
+
+	context.JSON(http.StatusOK, gin.H{"message": "User following"})
+}
 
 // func (h *UserHandler) UnfollowUser(context *gin.Context) {
 // 	var request requests.FolloweUserRequest

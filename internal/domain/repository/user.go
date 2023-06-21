@@ -36,6 +36,14 @@ func (u *UserRepository) FindUserByUsername(username string) (*entity.User, erro
 	return user, nil
 }
 
+func (u *UserRepository) FindUserByID(ID uint) (*entity.User, error) {
+	user := &entity.User{}
+	if err := u.FindByAttr("id", ID, user); err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {
 	user := &entity.User{}
 	if err := u.FindByAttr("email", email, user); err != nil {
