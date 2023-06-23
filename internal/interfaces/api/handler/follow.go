@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -35,10 +34,18 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		return
 	}
 	followUser, err := f.UserRepository.FindUserByID(request.FollowID)
-	log.Println("NEW FOLLOW -> ", newFollow)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	query := map[string]interface{}{"follower_id": userObj.ID, "following_id": followUser.ID}
+	exists := f.FollowRepository.FindLinkFollows(query)
+
+	if exists {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "AI CALICA"})
 		context.Abort()
 		return
 	}
@@ -49,8 +56,6 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 
 	newFollow.FollowerID = userObj.ID
 	newFollow.FollowingID = followUser.ID
-
-	log.Println("NEW FOLLOW -> ", newFollow)
 
 	err = f.FollowRepository.CreateFollow(&newFollow)
 
@@ -75,10 +80,10 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	follow.FollowingID = request.FollowID
-	follow.FollowerID = userObj.ID
+	query := map[string]interface{}{"following_id": request.FollowID, "follower_id": userObj.ID}
 
-	err := f.FollowRepository.FindByAttr(follow, &entity.Follow{})
+	err := f.FollowRepository.FindFollow(&follow, query)
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
@@ -87,7 +92,7 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 
 	attr := map[string]interface{}{"is_active": false}
 
-	err = f.FollowRepository.UpdateFollow(follow, attr)
+	err = f.FollowRepository.UpdateFollow(&follow, attr)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
