@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/domain/entity"
 	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
 type FollowHandler struct {
@@ -35,10 +35,18 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		return
 	}
 	followUser, err := f.UserRepository.FindUserByID(request.FollowID)
-	log.Println("NEW FOLLOW -> ", newFollow)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	query := map[string]interface{}{"follower_id": userObj.ID, "following_id": followUser.ID}
+	exists := f.FollowRepository.FindLinkFollows(query)
+
+	if exists {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "AI CALICA"})
 		context.Abort()
 		return
 	}
@@ -49,8 +57,6 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 
 	newFollow.FollowerID = userObj.ID
 	newFollow.FollowingID = followUser.ID
-
-	log.Println("NEW FOLLOW -> ", newFollow)
 
 	err = f.FollowRepository.CreateFollow(&newFollow)
 
@@ -75,10 +81,10 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	follow.FollowingID = request.FollowID
-	follow.FollowerID = userObj.ID
+	query := map[string]interface{}{"following_id": request.FollowID, "follower_id": userObj.ID}
 
-	err := f.FollowRepository.FindByAttr(follow, &entity.Follow{})
+	err := f.FollowRepository.FindFollow(&follow, query)
+
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		context.Abort()
@@ -87,7 +93,7 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 
 	attr := map[string]interface{}{"is_active": false}
 
-	err = f.FollowRepository.UpdateFollow(follow, attr)
+	err = f.FollowRepository.UpdateFollow(&follow, attr)
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -99,33 +105,33 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 
 }
 
-// func (h *UserHandler) GetFollowers(context *gin.Context) {
-// 	username := context.Param("username")
-// 	var response []responses.FollowUserResponse
+func (f *FollowHandler) GetFollowing(context *gin.Context) {
+	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
-// 	followers, err := h.userRepo.FindFollowers(username)
+	followers, err := f.FollowRepository.FindFollowing(username)
 
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followers"})
-// 		context.Abort()
-// 		return
-// 	}
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followers"})
+		context.Abort()
+		return
+	}
 
-// 	for _, following := range followers {
-// 		follow := responses.FollowUserResponse{
-// 			ID:       following.ID,
-// 			Username: following.Username,
-// 			FullName: following.FullName,
-// 		}
-// 		response = append(response, follow)
-// 	}
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
 
-// 	if len(followers) == 0 {
-// 		response = make([]responses.FollowUserResponse, 0)
-// 	}
+	if len(followers) == 0 {
+		response = make([]responses.FollowUserResponse, 0)
+	}
 
-// 	context.JSON(http.StatusOK, response)
-// }
+	context.JSON(http.StatusOK, response)
+}
 
 // func (h *UserHandler) GetFollowing(context *gin.Context) {
 // 	username := context.Param("username")
