@@ -34,16 +34,22 @@ func (f *FollowRepository) FindFollow(follow *entity.Follow, attr interface{}) e
 	return f.FindByAttr(follow, attr)
 }
 
-// func (u *UserRepository) FindFollowers(username string) ([]*entity.User, error) {
-// 	var user entity.User
-// 	result := u.db.Preload("Followers").Preload("Following").Where("username = ?", username).First(&user)
+func (u *FollowRepository) FindFollowing(username string) ([]entity.User, error) {
+	var followers []entity.User
 
-// 	if result.Error != nil {
-// 		return nil, result.Error
-// 	}
+	err := u.DB.Table("users").
+		Preload("Following").
+		Joins("INNER JOIN follows f ON users.id = f.following_id").
+		Joins("INNER JOIN users follower ON f.follower_id = follower.id").
+		Where("follower.username = ?", username).
+		Find(&followers).
+		Error
+	if err != nil {
+		return nil, err
+	}
 
-// 	return user.Followers, nil
-// }
+	return followers, nil
+}
 
 // func (u *UserRepository) FindFollowing(username string) ([]*entity.User, error) {
 // 	var user entity.User

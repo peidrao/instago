@@ -7,6 +7,7 @@ import (
 	"github.com/peidrao/instago/internal/domain/entity"
 	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
 type FollowHandler struct {
@@ -104,33 +105,33 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 
 }
 
-// func (h *UserHandler) GetFollowers(context *gin.Context) {
-// 	username := context.Param("username")
-// 	var response []responses.FollowUserResponse
+func (f *FollowHandler) GetFollowing(context *gin.Context) {
+	username := context.Param("username")
+	var response []responses.FollowUserResponse
 
-// 	followers, err := h.userRepo.FindFollowers(username)
+	followers, err := f.FollowRepository.FindFollowing(username)
 
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followers"})
-// 		context.Abort()
-// 		return
-// 	}
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve followers"})
+		context.Abort()
+		return
+	}
 
-// 	for _, following := range followers {
-// 		follow := responses.FollowUserResponse{
-// 			ID:       following.ID,
-// 			Username: following.Username,
-// 			FullName: following.FullName,
-// 		}
-// 		response = append(response, follow)
-// 	}
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
 
-// 	if len(followers) == 0 {
-// 		response = make([]responses.FollowUserResponse, 0)
-// 	}
+	if len(followers) == 0 {
+		response = make([]responses.FollowUserResponse, 0)
+	}
 
-// 	context.JSON(http.StatusOK, response)
-// }
+	context.JSON(http.StatusOK, response)
+}
 
 // func (h *UserHandler) GetFollowing(context *gin.Context) {
 // 	username := context.Param("username")
