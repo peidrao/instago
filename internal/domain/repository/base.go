@@ -32,22 +32,22 @@ func (r *GenericRepository) GetByID(id uint) (interface{}, error) {
 }
 
 func (r *GenericRepository) FindAll(entities interface{}) error {
-	if err := r.DB.Find(entities).Error; err != nil {
+	if err := r.DB.First(entities).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *GenericRepository) FindByAttr(attr string, value interface{}, entity interface{}) error {
-	if err := r.DB.Where(attr+" = ?", value).First(entity).Error; err != nil {
+func (r *GenericRepository) FindByAttr(entity interface{}, attr interface{}) error {
+	if err := r.DB.Where(attr).Find(&entity).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *GenericRepository) Update(data interface{}, id uint) error {
-	err := r.DB.Model(data).Where("id = ?", id).Updates(data).Error
+func (r *GenericRepository) Update(entity interface{}, attr interface{}) error {
+	err := r.DB.Model(entity).Updates(attr).Error
 	return err
 }
 
