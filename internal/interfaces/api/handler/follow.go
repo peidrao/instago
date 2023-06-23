@@ -22,6 +22,7 @@ func NewFollowHandler(
 		UserRepository:   userRepository,
 	}
 }
+
 func (f *FollowHandler) FollowUser(context *gin.Context) {
 	var request requests.FolloweUserRequest
 	var newFollow entity.Follow
@@ -33,19 +34,14 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	log.Println("PASSEI AQUI 1")
-	log.Println("FOLLOW -> ", request.FollowID)
-
 	followUser, err := f.UserRepository.FindUserByID(request.FollowID)
-	log.Println("FOLLOW -> ", followUser)
+	log.Println("NEW FOLLOW -> ", newFollow)
 
 	if err != nil {
-		// Melhor request
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
-	log.Println("PASSEI AQUI 2")
 
 	if followUser.IsPrivate {
 		newFollow.IsPrivate = true
@@ -54,41 +50,54 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 	newFollow.FollowerID = userObj.ID
 	newFollow.FollowingID = followUser.ID
 
+	log.Println("NEW FOLLOW -> ", newFollow)
+
 	err = f.FollowRepository.CreateFollow(&newFollow)
-	log.Println("PASSEI AQUI 3")
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to follow user"})
 		context.Abort()
 		return
 	}
-	log.Println("PASSEI AQUI 4")
 
 	context.JSON(http.StatusOK, gin.H{"message": "User following"})
 }
 
-// func (h *UserHandler) UnfollowUser(context *gin.Context) {
-// 	var request requests.FolloweUserRequest
-// 	user, _ := context.Get("user")
+func (f *FollowHandler) UnfollowUser(context *gin.Context) {
+	var request requests.FolloweUserRequest
+	var follow entity.Follow
+	user, _ := context.Get("user")
 
-// 	userObj, _ := user.(*entity.User)
+	userObj, _ := user.(*entity.User)
 
-// 	if err := context.ShouldBindJSON(&request); err != nil {
-// 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-// 		context.Abort()
-// 		return
-// 	}
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		context.Abort()
+		return
+	}
+	follow.FollowingID = request.FollowID
+	follow.FollowerID = userObj.ID
 
-// 	err := h.userRepo.UnFollowUser(userObj.ID, request.FollowID)
-// 	if err != nil {
-// 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		context.Abort()
-// 		return
-// 	}
+	err := f.FollowRepository.FindByAttr(follow, &entity.Follow{})
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
 
-// 	context.JSON(http.StatusOK, gin.H{"message": "Follower removal successful."})
+	attr := map[string]interface{}{"is_active": false}
 
-// }
+	err = f.FollowRepository.UpdateFollow(follow, attr)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Follower removal successful."})
+
+}
 
 // func (h *UserHandler) GetFollowers(context *gin.Context) {
 // 	username := context.Param("username")

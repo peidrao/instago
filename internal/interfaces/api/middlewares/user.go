@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 func SetUserMiddleware(userRepository *repository.UserRepository) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		username, _ := context.Get("username")
-
+		log.Println("PASSEI AQUI MEUS AMIGOS ->>>>>", username)
 		str, ok := username.(string)
 		if ok {
 			user, err := userRepository.FindUserByUsername(str)

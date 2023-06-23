@@ -19,35 +19,9 @@ func (f *FollowRepository) CreateFollow(follow *entity.Follow) error {
 	return f.Create(follow)
 }
 
-// func (u *UserRepository) FollowUser(userID, followerID uint) error {
-
-// 	follower, err := u.FindUserByID(userID)
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	followed, err := u.FindUserByID(followerID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	follower.Following = append(follower.Following, followed)
-
-// 	_, err = u.UpdateUser(follower)
-
-// 	return err
-// }
-
-// func (u *UserRepository) UnFollowUser(userID, unfollowerID uint) error {
-// 	result := u.db.Exec("DELETE FROM user_followers WHERE follower_id = ? and followed_id = ?", unfollowerID, userID)
-
-// 	if result.Error != nil {
-// 		return result.Error
-// 	}
-
-// 	return nil
-// }
+func (f *FollowRepository) UpdateFollow(follow entity.Follow, attr interface{}) error {
+	return f.Update(follow, attr)
+}
 
 // func (u *UserRepository) FindFollowers(username string) ([]*entity.User, error) {
 // 	var user entity.User
