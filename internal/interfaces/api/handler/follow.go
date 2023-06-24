@@ -169,7 +169,7 @@ func (f *FollowHandler) GetFollowers(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) GetRequestsFollowers(context *gin.Context) {
+func (f *FollowHandler) GetFollowersRequest(context *gin.Context) {
 	var response []responses.FollowUserResponse
 
 	user, _ := context.Get("userID")
@@ -230,7 +230,7 @@ func (f *FollowHandler) AcceptRequest(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": "Ok"})
 }
 
-func (f *FollowHandler) MeRequestFollowing(context *gin.Context) {
+func (f *FollowHandler) GetFollowingRequest(context *gin.Context) {
 	var response []responses.FollowUserResponse
 
 	userID := context.GetUint("userID")
