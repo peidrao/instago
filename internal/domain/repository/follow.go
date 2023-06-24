@@ -19,6 +19,10 @@ func (f *FollowRepository) CreateFollow(follow *entity.Follow) error {
 	return f.Create(&follow)
 }
 
+func (f *FollowRepository) DeleteFollow(follow *entity.Follow, ID uint) error {
+	return f.Delete(&follow, ID)
+}
+
 func (f *FollowRepository) UpdateFollow(follow *entity.Follow, attr interface{}) error {
 	return f.Update(&follow, attr)
 }
@@ -77,6 +81,24 @@ func (u *FollowRepository) FindRequestFollowers(ID uint) ([]entity.User, error) 
 		Preload("Following").
 		Joins("INNER JOIN follows f ON users.id = f.follower_id").
 		Joins("INNER JOIN users u ON f.following_id = u.id").
+		Where("u.id = ?", ID).
+		Where("f.is_accept = false").
+		Find(&requests).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return requests, nil
+}
+
+func (u *FollowRepository) FindRequestFollowing(ID uint) ([]entity.User, error) {
+	var requests []entity.User
+
+	err := u.DB.Table("users").
+		Preload("Following").
+		Joins("INNER JOIN follows f ON users.id = f.following_id").
+		Joins("INNER JOIN users u ON f.follower_id = u.id").
 		Where("u.id = ?", ID).
 		Where("f.is_accept = false").
 		Find(&requests).

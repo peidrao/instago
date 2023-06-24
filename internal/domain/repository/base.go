@@ -51,7 +51,7 @@ func (r *GenericRepository) Update(entity interface{}, attr interface{}) error {
 	return err
 }
 
-func (r *GenericRepository) Delete(id uint) error {
-	err := r.DB.Delete(nil, id).Error
+func (r *GenericRepository) Delete(entity interface{}, ID uint) error {
+	err := r.DB.Delete(entity, ID).Error
 	return err
 }

@@ -169,7 +169,7 @@ func (f *FollowHandler) GetFollowers(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) GetRequestsFollowers(context *gin.Context) {
+func (f *FollowHandler) GetFollowersRequest(context *gin.Context) {
 	var response []responses.FollowUserResponse
 
 	user, _ := context.Get("userID")
@@ -228,4 +228,62 @@ func (f *FollowHandler) AcceptRequest(context *gin.Context) {
 		return
 	}
 	context.JSON(http.StatusOK, gin.H{"message": "Ok"})
+}
+
+func (f *FollowHandler) GetFollowingRequest(context *gin.Context) {
+	var response []responses.FollowUserResponse
+
+	userID := context.GetUint("userID")
+
+	followers, err := f.FollowRepository.FindRequestFollowing(userID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+	context.JSON(http.StatusOK, response)
+}
+
+func (f *FollowHandler) CancelRequest(context *gin.Context) {
+	var request requests.UserIDRequest
+	var follow entity.Follow
+
+	user, _ := context.Get("userID")
+
+	userID, _ := user.(uint)
+
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		context.Abort()
+		return
+	}
+
+	attr := map[string]interface{}{"follower_id": userID, "following_id": request.ID}
+
+	err := f.FollowRepository.FindFollow(&follow, attr)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	err = f.FollowRepository.DeleteFollow(&follow, follow.ID)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"message": "Delete"})
 }

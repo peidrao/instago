@@ -19,7 +19,11 @@ func Init() *gorm.DB {
 
 	log.Println("Connected to database")
 
-	db.AutoMigrate(&entity.User{}, &entity.Follow{})
+	db.AutoMigrate(
+		&entity.User{},
+		&entity.Follow{},
+		&entity.Post{},
+	)
 
 	return db
 }

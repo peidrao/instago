@@ -17,27 +17,56 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	followRepository := repository.NewFollowRepository(db)
 	followHandler := handler.NewFollowHandler(userRepo, followRepository)
 
+	postRepository := repository.NewPostRepository(db)
+	postHandler := handler.NewPostHandler(userRepo, postRepository)
+
 	api := router.Group("/api")
 
-	api.POST("users/", userHandler.CreateUser)
+	auth := api.Group("/auth")
+	{
+		auth.POST("/users", userHandler.CreateUser)
+		auth.POST("/login", userHandler.LoginHandler)
+	}
 
-	api.POST("login/", userHandler.LoginHandler)
+	authenticated := api.Group("/")
+	authenticated.Use(middlewares.AuthMiddleware())
+	authenticated.Use(middlewares.SetUserMiddleware(userRepo))
+	{
 
-	api.Use(middlewares.AuthMiddleware())
-	api.Use(middlewares.SetUserMiddleware(userRepo))
-	api.GET("users/:username", userHandler.GetUser)
-	api.GET("me/", userHandler.UserMe)
+		users := authenticated.Group("users/")
+		{
+			users.GET(":username/", userHandler.GetUser)
+			users.GET("me/", userHandler.UserMe)
+		}
 
-	api.POST("follow/", followHandler.FollowUser)
-	api.POST("unfollow/", followHandler.UnfollowUser)
-	api.GET("following/:username", followHandler.GetFollowing)
-	api.GET("followers/:username", followHandler.GetFollowers)
-	api.GET("followers/requests/", followHandler.GetRequestsFollowers)
-	api.POST("followers/requests/", followHandler.AcceptRequest)
+		follows := authenticated.Group("follow/")
+		{
+			follows.POST("create/", followHandler.FollowUser)
+			follows.POST("delete/", followHandler.UnfollowUser)
+			follows.GET(":username/", followHandler.GetFollowers)
+			follows.GET("requests/", followHandler.GetFollowersRequest)
+			follows.POST("requests/", followHandler.AcceptRequest)
+		}
 
-	api.Use(middlewares.IsAdminUser())
+		following := authenticated.Group("following/")
+		{
+			following.GET(":username/", followHandler.GetFollowing)
+			following.GET("requests/", followHandler.GetFollowingRequest)
+			following.POST("delete/", followHandler.CancelRequest)
+		}
 
-	api.GET("users/", userHandler.GetAllUsers)
+		posts := authenticated.Group("posts/")
+		{
+			posts.POST("", postHandler.CreatePost)
+		}
+	}
+
+	admin := api.Group("/admin")
+	admin.Use(middlewares.IsAdminUser())
+	{
+		admin.GET("/users", userHandler.GetAllUsers)
+
+	}
 
 	return router
 }
