@@ -22,13 +22,11 @@ func (r *GenericRepository) Create(data interface{}) error {
 	return nil
 }
 
-func (r *GenericRepository) GetByID(id uint) (interface{}, error) {
-	var result interface{}
-
+func (r *GenericRepository) GetByID(result interface{}, id uint) error {
 	if err := r.DB.First(&result, id).Error; err != nil {
-		return nil, err
+		return err
 	}
-	return result, nil
+	return nil
 }
 
 func (r *GenericRepository) FindAll(entities interface{}) error {
