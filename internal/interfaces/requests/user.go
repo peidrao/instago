@@ -8,3 +8,7 @@ type CredentialsRequest struct {
 type FolloweUserRequest struct {
 	FollowID uint `json:"follow_id"`
 }
+
+type UserIDRequest struct {
+	ID uint `json:"id"`
+}
