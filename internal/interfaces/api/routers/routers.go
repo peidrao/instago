@@ -58,6 +58,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		posts := authenticated.Group("posts/")
 		{
 			posts.POST("", postHandler.CreatePost)
+			posts.GET("me/", postHandler.GetMePosts)
+			posts.GET(":id/", postHandler.GetPost)
 		}
 	}
 
