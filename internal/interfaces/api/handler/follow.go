@@ -66,6 +66,12 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		return
 	}
 
+	if followUser.IsPrivate {
+		context.JSON(http.StatusOK, gin.H{"message": "Request sent!"})
+		return
+
+	}
+
 	context.JSON(http.StatusOK, gin.H{"message": "User following"})
 }
 
@@ -158,5 +164,31 @@ func (f *FollowHandler) GetFollowers(context *gin.Context) {
 		response = make([]responses.FollowUserResponse, 0)
 	}
 
+	context.JSON(http.StatusOK, response)
+}
+
+func (f *FollowHandler) GetRequestsFollowers(context *gin.Context) {
+	var response []responses.FollowUserResponse
+
+	user, _ := context.Get("userID")
+
+	userID, _ := user.(uint)
+
+	followers, err := f.FollowRepository.FindRequestFollowers(userID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
 	context.JSON(http.StatusOK, response)
 }

@@ -42,6 +42,7 @@ func (u *FollowRepository) FindFollowing(username string) ([]entity.User, error)
 		Joins("INNER JOIN follows f ON users.id = f.following_id").
 		Joins("INNER JOIN users follower ON f.follower_id = follower.id").
 		Where("follower.username = ?", username).
+		Where("f.is_private = false").
 		Find(&following).
 		Error
 	if err != nil {
@@ -66,4 +67,22 @@ func (u *FollowRepository) FindFollowers(username string) ([]entity.User, error)
 	}
 
 	return followers, nil
+}
+
+func (u *FollowRepository) FindRequestFollowers(ID uint) ([]entity.User, error) {
+	var requests []entity.User
+
+	err := u.DB.Table("users").
+		Preload("Following").
+		Joins("INNER JOIN follows f ON users.id = f.follower_id").
+		Joins("INNER JOIN users u ON f.following_id = u.id").
+		Where("u.id = ?", ID).
+		Where("f.is_private = true").
+		Find(&requests).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return requests, nil
 }
