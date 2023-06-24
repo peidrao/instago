@@ -16,22 +16,22 @@ func NewFollowRepository(db *gorm.DB) *FollowRepository {
 }
 
 func (f *FollowRepository) CreateFollow(follow *entity.Follow) error {
-	return f.Create(follow)
+	return f.Create(&follow)
 }
 
 func (f *FollowRepository) UpdateFollow(follow *entity.Follow, attr interface{}) error {
-	return f.Update(follow, attr)
+	return f.Update(&follow, attr)
 }
 
 func (f *FollowRepository) FindLinkFollows(attr interface{}) bool {
-	follow := &entity.Follow{}
-	_ = f.FindByAttr(follow, attr)
+	var follow entity.Follow
+	_ = f.FindByAttr(&follow, attr)
 
 	return follow.ID != 0
 }
 
 func (f *FollowRepository) FindFollow(follow *entity.Follow, attr interface{}) error {
-	return f.FindByAttr(follow, attr)
+	return f.FindByAttr(&follow, attr)
 }
 
 func (u *FollowRepository) FindFollowing(username string) ([]entity.User, error) {
@@ -42,7 +42,7 @@ func (u *FollowRepository) FindFollowing(username string) ([]entity.User, error)
 		Joins("INNER JOIN follows f ON users.id = f.following_id").
 		Joins("INNER JOIN users follower ON f.follower_id = follower.id").
 		Where("follower.username = ?", username).
-		Where("f.is_private = false").
+		Where("f.is_accept = true").
 		Find(&following).
 		Error
 	if err != nil {
@@ -58,8 +58,9 @@ func (u *FollowRepository) FindFollowers(username string) ([]entity.User, error)
 	err := u.DB.Table("users").
 		Preload("Followers").
 		Joins("INNER JOIN follows f ON users.id = f.follower_id").
-		Joins("INNER JOIN users follower ON f.following_id = follower.id").
-		Where("follower.username = ?", username).
+		Joins("INNER JOIN users u ON f.following_id = u.id").
+		Where("u.username = ?", username).
+		Where("f.is_accept = ?", true).
 		Find(&followers).
 		Error
 	if err != nil {
@@ -77,7 +78,7 @@ func (u *FollowRepository) FindRequestFollowers(ID uint) ([]entity.User, error) 
 		Joins("INNER JOIN follows f ON users.id = f.follower_id").
 		Joins("INNER JOIN users u ON f.following_id = u.id").
 		Where("u.id = ?", ID).
-		Where("f.is_private = true").
+		Where("f.is_accept = false").
 		Find(&requests).
 		Error
 	if err != nil {

@@ -14,9 +14,9 @@ type UserDetailResponse struct {
 	Bio      string `json:"bio"`
 	Link     string `json:"link"`
 
-	Picture string `json:"picture"`
-	// Followers uint   `json:"followers"`
-	// Following uint   `json:"following"`
+	Picture   string `json:"picture"`
+	Followers uint   `json:"followers"`
+	Following uint   `json:"following"`
 
 	CreatedAt time.Time `json:"created_at"`
 }

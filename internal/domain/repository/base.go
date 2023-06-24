@@ -40,7 +40,7 @@ func (r *GenericRepository) FindAll(entities interface{}) error {
 }
 
 func (r *GenericRepository) FindByAttr(entity interface{}, attr interface{}) error {
-	if err := r.DB.Where(attr).Find(&entity).Error; err != nil {
+	if err := r.DB.Where(attr).Find(entity).Error; err != nil {
 		return err
 	}
 	return nil
