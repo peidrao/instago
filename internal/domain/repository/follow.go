@@ -19,6 +19,10 @@ func (f *FollowRepository) CreateFollow(follow *entity.Follow) error {
 	return f.Create(&follow)
 }
 
+func (f *FollowRepository) DeleteFollow(follow *entity.Follow, ID uint) error {
+	return f.Delete(&follow, ID)
+}
+
 func (f *FollowRepository) UpdateFollow(follow *entity.Follow, attr interface{}) error {
 	return f.Update(&follow, attr)
 }

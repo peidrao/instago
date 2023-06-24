@@ -253,3 +253,37 @@ func (f *FollowHandler) MeRequestFollowing(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, response)
 }
+
+func (f *FollowHandler) CancelRequest(context *gin.Context) {
+	var request requests.UserIDRequest
+	var follow entity.Follow
+
+	user, _ := context.Get("userID")
+
+	userID, _ := user.(uint)
+
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		context.Abort()
+		return
+	}
+
+	attr := map[string]interface{}{"follower_id": userID, "following_id": request.ID}
+
+	err := f.FollowRepository.FindFollow(&follow, attr)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	err = f.FollowRepository.DeleteFollow(&follow, follow.ID)
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"message": "Delete"})
+}

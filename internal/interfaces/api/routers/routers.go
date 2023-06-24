@@ -34,6 +34,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	api.GET("followers/:username", followHandler.GetFollowers)
 
 	api.GET("following/requests/", followHandler.MeRequestFollowing)
+	api.POST("following/cancel/", followHandler.CancelRequest)
 	api.GET("followers/requests/", followHandler.GetRequestsFollowers)
 	api.POST("followers/requests/", followHandler.AcceptRequest)
 
