@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/peidrao/instago/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -33,14 +31,9 @@ func (u *UserRepository) FindAllUsers() ([]entity.User, error) {
 func (u *UserRepository) FindUserByUsername(username string) (*entity.User, error) {
 	user := &entity.User{}
 
-	log.Println(user)
-	log.Println("FIND USER BY USERNAME", user.Username)
-
-	if err := u.FindByAttr(user, entity.User{Username: username}); err != nil {
+	if err := u.FindByAttr(&user, entity.User{Username: username}); err != nil {
 		return nil, err
 	}
-
-	log.Println("FIND USER BY USERNAME FINAL ->", user.Username)
 
 	return user, nil
 }
@@ -49,7 +42,7 @@ func (u *UserRepository) FindUserByID(ID uint) (*entity.User, error) {
 	user := &entity.User{}
 	attr := map[string]interface{}{"id": ID}
 
-	if err := u.FindByAttr(user, attr); err != nil {
+	if err := u.FindByAttr(&user, attr); err != nil {
 		return nil, err
 	}
 	return user, nil
@@ -60,7 +53,7 @@ func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {
 	user := &entity.User{}
 	attr := map[string]interface{}{"email": email}
 
-	if err := u.FindByAttr(user, attr); err != nil {
+	if err := u.FindByAttr(&user, attr); err != nil {
 		return nil, err
 	}
 	return nil, nil
