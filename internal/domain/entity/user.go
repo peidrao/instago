@@ -20,10 +20,10 @@ type User struct {
 	IsAdmin   bool   `json:"admin" gorm:"default:false"`
 	Link      string `json:"link" gorm:"null"`
 
-	ProfilePicture string `json:"profile_picture" gorm:"null"`
-	// Posts          []Post
-	Followers []Follow `gorm:"foreignKey:FollowerID"`
-	Following []Follow `gorm:"foreignKey:FollowingID"`
+	ProfilePicture string   `json:"profile_picture" gorm:"null"`
+	Posts          []Post   `json:"posts" gorm:"foreignKey:UserID"`
+	Followers      []Follow `gorm:"foreignKey:FollowerID"`
+	Following      []Follow `gorm:"foreignKey:FollowingID"`
 
 	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
