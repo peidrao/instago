@@ -21,6 +21,7 @@ func SetUserMiddleware(userRepository *repository.UserRepository) gin.HandlerFun
 				context.Abort()
 			}
 			context.Set("user", user)
+			context.Set("userID", user.ID)
 			context.Next()
 		}
 	}
