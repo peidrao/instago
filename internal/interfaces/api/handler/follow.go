@@ -35,7 +35,7 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		context.Abort()
 		return
 	}
-	userFollowing, err := f.UserRepository.FindUserByID(request.FollowID)
+	userFollowing, _, _, err := f.UserRepository.FindUserByID(request.FollowID)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -213,16 +213,12 @@ func (f *FollowHandler) AcceptRequest(context *gin.Context) {
 
 	err := f.FollowRepository.FindFollow(&follow, attr)
 
-	log.Println("FOLLOW USER 1 -> ", follow)
-
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		context.Abort()
 		return
 	}
 	attr = map[string]interface{}{"is_accept": true}
-
-	log.Println("FOLLOW USER -> ", &follow)
 
 	err = f.FollowRepository.UpdateFollow(&follow, attr)
 

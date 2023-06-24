@@ -12,7 +12,7 @@ func SetUserMiddleware(userRepository *repository.UserRepository) gin.HandlerFun
 		username, _ := context.Get("username")
 		str, ok := username.(string)
 		if ok {
-			user, err := userRepository.FindUserByUsername(str)
+			user, _, _, err := userRepository.FindUserByUsername(str)
 
 			if err != nil {
 				context.JSON(http.StatusNotFound, gin.H{"error": "username not found in database"})

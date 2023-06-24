@@ -28,25 +28,38 @@ func (u *UserRepository) FindAllUsers() ([]entity.User, error) {
 	return users, nil
 }
 
-func (u *UserRepository) FindUserByUsername(username string) (*entity.User, error) {
+func (u *UserRepository) FindUserFollowersCount(user *entity.User) (uint, uint) {
+	followers := u.DB.Model(user).Where("is_accept= true").Association("Following").Count()
+
+	following := u.DB.Model(user).Where("is_accept= true").Association("Followers").Count()
+
+	return uint(followers), uint(following)
+
+}
+
+func (u *UserRepository) FindUserByUsername(username string) (*entity.User, uint, uint, error) {
 	user := &entity.User{}
 
 	if err := u.FindByAttr(&user, entity.User{Username: username}); err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
 
-	return user, nil
+	followers, following := u.FindUserFollowersCount(user)
+
+	return user, followers, following, nil
 }
 
-func (u *UserRepository) FindUserByID(ID uint) (*entity.User, error) {
+func (u *UserRepository) FindUserByID(ID uint) (*entity.User, uint, uint, error) {
 	user := &entity.User{}
 	attr := map[string]interface{}{"id": ID}
 
 	if err := u.FindByAttr(&user, attr); err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
-	return user, nil
 
+	followers, following := u.FindUserFollowersCount(user)
+
+	return user, followers, following, nil
 }
 
 func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {

@@ -65,19 +65,16 @@ func (h *UserHandler) CreateUser(context *gin.Context) {
 func (h *UserHandler) GetUser(context *gin.Context) {
 	username := context.Param("username")
 
-	user, err := h.UserRepository.FindUserByUsername(username)
+	user, followers, following, err := h.UserRepository.FindUserByUsername(username)
 	if err != nil {
 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 		return
 	}
 
-	// followers, _ := h.userRepo.FindFollowers(username)
-	// following, _ := h.userRepo.FindFollowing(username)
-
 	response := serializers.UserDetailSerializer(
 		user,
-		// uint(len(followers)),
-		// uint(len(following)),
+		followers,
+		following,
 	)
 
 	context.JSON(http.StatusOK, response)
@@ -93,25 +90,20 @@ func (h *UserHandler) GetAllUsers(context *gin.Context) {
 	context.JSON(http.StatusOK, users)
 }
 
-// func (h *UserHandler) RemoveUser(context *gin.Context) {
-// 	userContext, exists := context.Get("user")
+func (h *UserHandler) UserMe(context *gin.Context) {
+	userID := context.GetUint("userID")
 
-// 	if !exists {
-// 		context.JSON(http.StatusNotFound, gin.H{"error": "user not found in database"})
-// 		context.Abort()
-// 		return
-// 	}
+	user, followers, following, err := h.UserRepository.FindUserByID(userID)
 
-// 	if user, ok := userContext.(*entity.User); ok {
-// 		user.IsActive = false
-// 		user.UpdatedAt = time.Now()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
 
-// 		_, err := h.UserRepository.UpdateUser(user, user.ID)
-// 		if err != nil {
-// 			context.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
-// 			return
-// 		}
+	response := serializers.UserDetailSerializer(
+		user,
+		followers,
+		following,
+	)
 
-// 		context.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
-// 	}
-// }
+	context.JSON(http.StatusOK, response)
+}

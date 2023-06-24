@@ -16,7 +16,7 @@ func (h *UserHandler) LoginHandler(context *gin.Context) {
 		return
 	}
 
-	user, err := h.UserRepository.FindUserByUsername(credentials.Username)
+	user, _, _, err := h.UserRepository.FindUserByUsername(credentials.Username)
 	if err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
