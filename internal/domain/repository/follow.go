@@ -87,3 +87,21 @@ func (u *FollowRepository) FindRequestFollowers(ID uint) ([]entity.User, error) 
 
 	return requests, nil
 }
+
+func (u *FollowRepository) FindRequestFollowing(ID uint) ([]entity.User, error) {
+	var requests []entity.User
+
+	err := u.DB.Table("users").
+		Preload("Following").
+		Joins("INNER JOIN follows f ON users.id = f.following_id").
+		Joins("INNER JOIN users u ON f.follower_id = u.id").
+		Where("u.id = ?", ID).
+		Where("f.is_accept = false").
+		Find(&requests).
+		Error
+	if err != nil {
+		return nil, err
+	}
+
+	return requests, nil
+}

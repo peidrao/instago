@@ -229,3 +229,27 @@ func (f *FollowHandler) AcceptRequest(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{"message": "Ok"})
 }
+
+func (f *FollowHandler) MeRequestFollowing(context *gin.Context) {
+	var response []responses.FollowUserResponse
+
+	userID := context.GetUint("userID")
+
+	followers, err := f.FollowRepository.FindRequestFollowing(userID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	for _, following := range followers {
+		follow := responses.FollowUserResponse{
+			ID:       following.ID,
+			Username: following.Username,
+			FullName: following.FullName,
+		}
+		response = append(response, follow)
+	}
+	context.JSON(http.StatusOK, response)
+}
