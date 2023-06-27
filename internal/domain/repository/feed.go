@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/peidrao/instago/internal/domain/entity"
 	"gorm.io/gorm"
 )
@@ -20,13 +18,12 @@ func NewFeedRepository(db *gorm.DB) *FeedRepository {
 func (f *FeedRepository) GetMeFeed(ID uint) ([]entity.Post, error) {
 	var posts []entity.Post
 
-	log.Print("USER_ID -> ", ID)
-
 	err := f.DB.Table("posts p").
 		Preload("User").
 		Joins("JOIN users u ON u.id = p.user_id").
 		Joins("JOIN follows f ON f.following_id = u.id").
 		Where("f.follower_id = ?", ID).
+		Where("f.is_active = true").
 		Or("p.user_id = ?", ID).
 		Find(&posts).
 		Error
