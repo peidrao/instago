@@ -43,3 +43,16 @@ func (p *PostRepository) FindPostByID(ID uint) (*entity.Post, error) {
 
 	return &post, nil
 }
+
+func (p *PostRepository) RemovePost(ID uint) error {
+	post, err := p.FindPostByID(ID)
+
+	if err != nil {
+		return err
+	}
+
+	if err := p.Delete(post, ID); err != nil {
+		return err
+	}
+	return nil
+}

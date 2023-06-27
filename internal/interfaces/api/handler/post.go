@@ -119,3 +119,21 @@ func (p *PostHandler) GetPost(context *gin.Context) {
 
 	context.JSON(http.StatusOK, response)
 }
+
+func (p *PostHandler) DeletePost(context *gin.Context) {
+	ID := context.Param("id")
+
+	uintID, err := strconv.ParseUint(ID, 10, 64)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = p.PostRepository.RemovePost(uint(uintID))
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Post removed"})
+}

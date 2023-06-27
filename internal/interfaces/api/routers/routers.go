@@ -60,6 +60,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			posts.POST("", postHandler.CreatePost)
 			posts.GET("me/", postHandler.GetMePosts)
 			posts.GET(":id/", postHandler.GetPost)
+			posts.DELETE(":id/", postHandler.DeletePost)
 		}
 	}
 
