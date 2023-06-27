@@ -9,8 +9,8 @@ import (
 type Post struct {
 	gorm.Model
 	ID        uint `gorm:"primaryKey"`
-	UserID    uint `gorm:"column:user_id"`    // Chave estrangeira para o ID do usuário
-	User      User `gorm:"foreignKey:UserID"` // Relacionamento com o usuário
+	UserID    uint `gorm:"column:user_id"`
+	User      User `gorm:"foreignKey:UserID"`
 	ImageURL  string
 	Caption   string
 	Location  string

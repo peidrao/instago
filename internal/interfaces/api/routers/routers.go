@@ -20,6 +20,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	postRepository := repository.NewPostRepository(db)
 	postHandler := handler.NewPostHandler(userRepo, postRepository)
 
+	feedRepository := repository.NewFeedRepository(db)
+	feedHandler := handler.NewFeedHandler(userRepo, postRepository, feedRepository)
+
 	api := router.Group("/api")
 
 	auth := api.Group("/auth")
@@ -58,6 +61,14 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		posts := authenticated.Group("posts/")
 		{
 			posts.POST("", postHandler.CreatePost)
+			posts.GET("me/", postHandler.GetMePosts)
+			posts.GET(":id/", postHandler.GetPost)
+			posts.DELETE(":id/", postHandler.DeletePost)
+		}
+
+		feed := authenticated.Group("feed/")
+		{
+			feed.GET("", feedHandler.FeedMe)
 		}
 	}
 
