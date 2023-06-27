@@ -47,6 +47,7 @@ func (u *FollowRepository) FindFollowing(username string) ([]entity.User, error)
 		Joins("INNER JOIN users follower ON f.follower_id = follower.id").
 		Where("follower.username = ?", username).
 		Where("f.is_accept = true").
+		Where("f.is_active = true").
 		Find(&following).
 		Error
 	if err != nil {
@@ -64,7 +65,8 @@ func (u *FollowRepository) FindFollowers(username string) ([]entity.User, error)
 		Joins("INNER JOIN follows f ON users.id = f.follower_id").
 		Joins("INNER JOIN users u ON f.following_id = u.id").
 		Where("u.username = ?", username).
-		Where("f.is_accept = ?", true).
+		Where("f.is_accept = true").
+		Where("f.is_active = true").
 		Find(&followers).
 		Error
 	if err != nil {

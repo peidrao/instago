@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -47,8 +46,29 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 	exists := f.FollowRepository.FindLinkFollows(query)
 
 	if exists {
-		context.JSON(http.StatusBadRequest, gin.H{"error": "AI CALICA"})
-		context.Abort()
+		err := f.FollowRepository.FindByAttr(&follow, query)
+		if err != nil {
+			context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			context.Abort()
+			return
+		}
+
+		attr := map[string]interface{}{"is_active": true}
+
+		err = f.FollowRepository.UpdateFollow(&follow, attr)
+
+		if err != nil {
+			context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			context.Abort()
+			return
+		}
+
+		if userFollowing.IsPrivate {
+			context.JSON(http.StatusOK, gin.H{"message": "Request sent!"})
+			return
+		}
+
+		context.JSON(http.StatusOK, gin.H{"message": "User following"})
 		return
 	}
 
@@ -67,8 +87,6 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 		return
 	}
 
-	log.Println("FOLLOW ACCEPT -> ", follow.IsAccept)
-
 	if userFollowing.IsPrivate {
 		context.JSON(http.StatusOK, gin.H{"message": "Request sent!"})
 		return
@@ -81,16 +99,14 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 	var request requests.FolloweUserRequest
 	var follow entity.Follow
-	user, _ := context.Get("user")
-
-	userObj, _ := user.(*entity.User)
+	userID := context.GetUint("userID")
 
 	if err := context.ShouldBindJSON(&request); err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		context.Abort()
 		return
 	}
-	query := map[string]interface{}{"following_id": request.FollowID, "follower_id": userObj.ID}
+	query := map[string]interface{}{"following_id": request.FollowID, "follower_id": userID}
 
 	err := f.FollowRepository.FindFollow(&follow, query)
 
