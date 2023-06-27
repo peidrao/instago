@@ -44,7 +44,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 		follows := authenticated.Group("follow/")
 		{
-			follows.POST("create/", followHandler.FollowUser)
+			follows.POST("", followHandler.FollowUser)
 			follows.POST("delete/", followHandler.UnfollowUser)
 			follows.GET(":username/", followHandler.GetFollowers)
 			follows.GET("requests/", followHandler.GetFollowersRequest)
