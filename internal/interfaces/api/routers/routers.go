@@ -38,6 +38,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 		users := authenticated.Group("users/")
 		{
+			users.PUT("", userHandler.UpdateUser)
+			users.PUT("picture/", userHandler.UpdatePictureUser)
 			users.GET(":username/", userHandler.GetUser)
 			users.GET("me/", userHandler.UserMe)
 		}

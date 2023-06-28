@@ -2,12 +2,14 @@ package handler
 
 import (
 	"net/http"
+	"path/filepath"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"github.com/peidrao/instago/internal/domain/entity"
 	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/api/serializers"
+	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/utils"
 )
 
@@ -97,6 +99,84 @@ func (h *UserHandler) UserMe(context *gin.Context) {
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	}
+
+	response := serializers.UserDetailSerializer(
+		user,
+		followers,
+		following,
+	)
+
+	context.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) UpdateUser(context *gin.Context) {
+	userID := context.GetUint("userID")
+	var request requests.UserUpdateRequest
+
+	if err := context.ShouldBindJSON(&request); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		context.Abort()
+		return
+	}
+
+	user, followers, following, err := h.UserRepository.FindUserByID(userID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.UserRepository.Update(&user, request)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	response := serializers.UserDetailSerializer(
+		user,
+		followers,
+		following,
+	)
+
+	context.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) UpdatePictureUser(context *gin.Context) {
+	userID := context.GetUint("userID")
+
+	user, followers, following, err := h.UserRepository.FindUserByID(userID)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	file, err := context.FormFile("picture")
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	filename := filepath.Base(file.Filename)
+	err = context.SaveUploadedFile(file, "static/picture/"+filename)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	imageURL := "/static/picture/" + filename
+
+	data := map[string]interface{}{"profile_picture": imageURL}
+
+	err = h.UserRepository.Update(&user, data)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	response := serializers.UserDetailSerializer(
