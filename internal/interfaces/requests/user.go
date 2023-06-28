@@ -5,6 +5,13 @@ type CredentialsRequest struct {
 	Password string `json:"password"`
 }
 
+type UserUpdateRequest struct {
+	FullName  string `json:"full_name"`
+	Bio       string `json:"bio"`
+	IsPrivate bool   `json:"private"`
+	Link      string `json:"link"`
+}
+
 type FolloweUserRequest struct {
 	FollowID uint `json:"follow_id"`
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/internal/interfaces/responses"
-
 )
 
 type PostHandler struct {
