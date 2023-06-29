@@ -18,7 +18,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	followHandler := handler.NewFollowHandler(userRepo, followRepository)
 
 	postRepository := repository.NewPostRepository(db)
-	postHandler := handler.NewPostHandler(userRepo, postRepository)
+	postHandler := handler.NewPostHandler(userRepo, postRepository, followRepository)
 
 	feedRepository := repository.NewFeedRepository(db)
 	feedHandler := handler.NewFeedHandler(userRepo, postRepository, feedRepository)
