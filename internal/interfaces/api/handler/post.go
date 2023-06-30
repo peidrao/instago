@@ -13,15 +13,20 @@ import (
 )
 
 type PostHandler struct {
-	PostRepository *repository.PostRepository
-	UserRepository *repository.UserRepository
+	PostRepository   *repository.PostRepository
+	UserRepository   *repository.UserRepository
+	FollowRepository *repository.FollowRepository
 }
 
 func NewPostHandler(
-	userRepository *repository.UserRepository, postRepository *repository.PostRepository) *PostHandler {
+	userRepository *repository.UserRepository,
+	postRepository *repository.PostRepository,
+	followRepository *repository.FollowRepository,
+) *PostHandler {
 	return &PostHandler{
-		PostRepository: postRepository,
-		UserRepository: userRepository,
+		PostRepository:   postRepository,
+		UserRepository:   userRepository,
+		FollowRepository: followRepository,
 	}
 }
 
@@ -96,12 +101,30 @@ func (p *PostHandler) GetMePosts(context *gin.Context) {
 func (p *PostHandler) GetPost(context *gin.Context) {
 	ID := context.Param("id")
 
+	userID := context.GetUint("userID")
+
 	uintID, err := strconv.ParseUint(ID, 10, 64)
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	post, err := p.PostRepository.FindPostByID(uint(uintID))
+	post, _ := p.PostRepository.FindPostByID(uint(uintID))
+
+	userIDByPost := post.UserID
+
+	user, _, _, err := p.UserRepository.FindUserByID(userIDByPost)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	query := map[string]interface{}{"follower_id": userID, "following_id": user.ID}
+	exists := p.FollowRepository.FindLinkFollows(query)
+
+	if !exists && user.IsPrivate {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "you cannot see a post from the user you are not following"})
+		return
+	}
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

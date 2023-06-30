@@ -8,10 +8,11 @@ import (
 func UserDetailSerializer(user *entity.User, followers uint, following uint) *responses.UserDetailResponse {
 
 	return &responses.UserDetailResponse{
-		Username: user.Username,
-		FullName: user.FullName,
-		Bio:      user.Bio,
-		Link:     user.Link,
+		Username:  user.Username,
+		FullName:  user.FullName,
+		Bio:       user.Bio,
+		Link:      user.Link,
+		IsPrivate: user.IsPrivate,
 
 		Picture:   user.ProfilePicture,
 		Followers: followers,
