@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"os"
 	"strings"
 	"time"
@@ -30,4 +31,31 @@ func ExtractBearerToken(headerValue string) string {
 		return parts[1]
 	}
 	return ""
+}
+
+func VerifyToken(tokenString string) (*jwt.Token, error) {
+	secretKey := os.Getenv("SECRET_KEY")
+
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if token.Valid {
+		return token, nil
+	} else if ve, ok := err.(*jwt.ValidationError); ok {
+		if ve.Errors&jwt.ValidationErrorMalformed != 0 {
+			return nil, jwt.ErrSignatureInvalid
+		} else if ve.Errors&(jwt.ValidationErrorExpired|jwt.ValidationErrorNotValidYet) != 0 {
+			return nil, errors.New("token has expired")
+		} else {
+			return nil, err
+		}
+	} else {
+		return nil, err
+	}
+
 }

@@ -33,8 +33,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	auth := api.Group("/auth")
 	{
-		auth.POST("/users", userHandler.CreateUser)
-		auth.POST("/login", userHandler.LoginHandler)
+		auth.POST("users/", userHandler.CreateUser)
+		auth.POST("login/", userHandler.LoginHandler)
+		auth.POST("token_is_valid/", userHandler.TokenIsValid)
 	}
 
 	authenticated := api.Group("/")
