@@ -61,7 +61,13 @@ func (h *UserHandler) CreateUser(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
+	response := serializers.UserDetailSerializer(
+		&user,
+		0,
+		0,
+	)
+
+	context.JSON(http.StatusCreated, response)
 }
 
 func (h *UserHandler) GetUser(context *gin.Context) {
