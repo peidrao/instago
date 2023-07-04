@@ -6,13 +6,21 @@ import (
 )
 
 func PostDetailSerializer(post *entity.Post) *responses.PostDetailResponse {
+	user := post.User
+
+	userResponse := responses.UserDetailShortResponse{
+		ID:       user.ID,
+		Username: user.Username,
+		FullName: user.FullName,
+		Picture:  user.ProfilePicture,
+	}
 
 	return &responses.PostDetailResponse{
 		ID:        post.ID,
-		UserID:    post.UserID,
 		ImageURL:  post.ImageURL,
 		Caption:   post.Caption,
 		Location:  post.Location,
 		CreatedAt: post.CreatedAt,
+		User:      userResponse,
 	}
 }
