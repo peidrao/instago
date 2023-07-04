@@ -16,6 +16,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	config.AllowCredentials = true
 	config.AddAllowHeaders("authorization")
 	router.Use(cors.New(config))
+	router.Static("/static", "./static")
 
 	userRepo := repository.NewUserRepository(db)
 	userHandler := handler.NewUserHandler(userRepo)
@@ -48,6 +49,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			users.PUT("", userHandler.UpdateUser)
 			users.PUT("picture/", userHandler.UpdatePictureUser)
 			users.GET(":username/", userHandler.GetUser)
+			
 			users.GET("me/", userHandler.UserMe)
 		}
 
