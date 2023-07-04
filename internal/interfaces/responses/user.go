@@ -8,6 +8,13 @@ type FollowUserResponse struct {
 	FullName string `json:"full_name"`
 }
 
+type UserDetailShortResponse struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+	FullName string `json:"full_name"`
+	Picture  string `json:"picture"`
+}
+
 type UserDetailResponse struct {
 	Username  string `json:"username"`
 	FullName  string `json:"full_name"`

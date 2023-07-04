@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/api/serializers"
 	"github.com/peidrao/instago/internal/interfaces/responses"
 )
 
@@ -40,15 +41,8 @@ func (f *FeedHandler) FeedMe(context *gin.Context) {
 	}
 
 	for _, f := range feed {
-		response := responses.PostDetailResponse{
-			ID:        f.ID,
-			UserID:    f.UserID,
-			ImageURL:  f.ImageURL,
-			Caption:   f.Caption,
-			Location:  f.Location,
-			CreatedAt: f.CreatedAt,
-		}
-		postResponse = append(postResponse, response)
+		serializedPost := serializers.PostDetailSerializer(&f)
+		postResponse = append(postResponse, *serializedPost)
 	}
 
 	context.JSON(http.StatusOK, postResponse)

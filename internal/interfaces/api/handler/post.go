@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/domain/entity"
 	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/api/serializers"
 	"github.com/peidrao/instago/internal/interfaces/requests"
 	"github.com/peidrao/instago/internal/interfaces/responses"
 )
@@ -84,15 +85,8 @@ func (p *PostHandler) GetMePosts(context *gin.Context) {
 	}
 
 	for _, post := range posts {
-		response := responses.PostDetailResponse{
-			ID:        post.ID,
-			UserID:    post.UserID,
-			ImageURL:  post.ImageURL,
-			Caption:   post.Caption,
-			Location:  post.Location,
-			CreatedAt: post.CreatedAt,
-		}
-		postResponse = append(postResponse, response)
+		serializedPost := serializers.PostDetailSerializer(&post)
+		postResponse = append(postResponse, *serializedPost)
 	}
 
 	context.JSON(http.StatusOK, postResponse)
@@ -131,14 +125,7 @@ func (p *PostHandler) GetPost(context *gin.Context) {
 		return
 	}
 
-	response := responses.PostDetailResponse{
-		ID:        post.ID,
-		UserID:    post.UserID,
-		ImageURL:  post.ImageURL,
-		Caption:   post.Caption,
-		Location:  post.Location,
-		CreatedAt: post.CreatedAt,
-	}
+	response := serializers.PostDetailSerializer(post)
 
 	context.JSON(http.StatusOK, response)
 }
