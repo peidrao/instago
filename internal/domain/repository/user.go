@@ -34,7 +34,6 @@ func (u *UserRepository) FindUserFollowersCount(user *entity.User) (uint, uint) 
 	following := u.DB.Model(user).Where("is_accept= true").Association("Followers").Count()
 
 	return uint(followers), uint(following)
-
 }
 
 func (u *UserRepository) FindUserByUsername(username string) (*entity.User, uint, uint, error) {
@@ -79,4 +78,20 @@ func (u *UserRepository) UpdateUser(user *entity.User, ID uint) (*entity.User, e
 	}
 
 	return user, nil
+}
+
+func (u *UserRepository) FindUsersSuggestions(ID uint) []entity.User {
+	var users []entity.User
+	subQuery := u.DB.Table("follows").
+		Select("following_id").
+		Where("follower_id = ?", ID)
+
+	u.DB.Table("users u").
+		Where("u.id <> ?", ID).
+		Not("u.id IN (?)", subQuery).
+		Order("u.created_at ASC").
+		Limit(3).
+		Find(&users)
+
+	return users
 }

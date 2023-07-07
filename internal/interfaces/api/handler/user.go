@@ -10,6 +10,7 @@ import (
 	"github.com/peidrao/instago/internal/domain/repository"
 	"github.com/peidrao/instago/internal/interfaces/api/serializers"
 	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 	"github.com/peidrao/instago/utils"
 )
 
@@ -192,4 +193,24 @@ func (h *UserHandler) UpdatePictureUser(context *gin.Context) {
 	)
 
 	context.JSON(http.StatusOK, response)
+}
+
+func (h *UserHandler) GetSuggestionsForUser(context *gin.Context) {
+	userID := context.GetUint("userID")
+	var usesResponse []responses.UserDetailShortResponse
+
+	users := h.UserRepository.FindUsersSuggestions(userID)
+
+	for _, user := range users {
+		response := responses.UserDetailShortResponse{
+			ID:       user.ID,
+			Username: user.Username,
+			FullName: user.FullName,
+			Picture:  user.ProfilePicture,
+		}
+		usesResponse = append(usesResponse, response)
+	}
+
+	context.JSON(http.StatusOK, usesResponse)
+
 }

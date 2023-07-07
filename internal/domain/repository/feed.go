@@ -25,6 +25,7 @@ func (f *FeedRepository) GetMeFeed(ID uint) ([]entity.Post, error) {
 		Where("f.follower_id = ?", ID).
 		Where("f.is_active = true").
 		Or("p.user_id = ?", ID).
+		Order("p.created_at DESC").
 		Find(&posts).
 		Error
 	if err != nil {
