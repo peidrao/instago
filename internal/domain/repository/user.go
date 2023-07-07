@@ -90,6 +90,7 @@ func (u *UserRepository) FindUsersSuggestions(ID uint) []entity.User {
 		Where("u.id <> ?", ID).
 		Not("u.id IN (?)", subQuery).
 		Order("u.created_at ASC").
+		Limit(3).
 		Find(&users)
 
 	return users
