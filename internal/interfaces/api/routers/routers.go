@@ -49,6 +49,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			users.PUT("", userHandler.UpdateUser)
 			users.PUT("picture/", userHandler.UpdatePictureUser)
 			users.GET(":username/", userHandler.GetUser)
+			users.GET("suggestions/", userHandler.GetSuggestionsForUser)
 			
 			users.GET("me/", userHandler.UserMe)
 		}
