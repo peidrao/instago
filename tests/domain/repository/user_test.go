@@ -58,3 +58,31 @@ func TestUserCreateRepository(t *testing.T) {
 	assert.Equal(t, user.Email, savedUser.Email, "E-mails não coincidem")
 	assert.Equal(t, user.Password, savedUser.Password, "Senhas não coincidem")
 }
+
+func TestFindAllUsersRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	users := []entity.User{
+		{Username: "user1", Email: "user1@example.com", Password: utils.GenerateRandomString(5)},
+		{Username: "user2", Email: "user2@example.com", Password: utils.GenerateRandomString(5)},
+		{Username: "user3", Email: "user3@example.com", Password: utils.GenerateRandomString(5)},
+		{Username: "user4", Email: "user4@example.com", Password: utils.GenerateRandomString(5)},
+		{Username: "user5", Email: "user5@example.com", Password: utils.GenerateRandomString(5)},
+	}
+	for i := range users {
+		if err := userRepo.CreateUser(&users[i]); err != nil {
+			t.Fatalf("Erro ao criar usuário: %v", err)
+		}
+	}
+
+	resultUsers, err := userRepo.FindAllUsers()
+	assert.NoError(t, err, "Erro ao buscar usuários")
+	assert.Len(t, resultUsers, len(users), "Quantidade de usuários está incorreta")
+
+	// for i, user := range users {
+	// 	assert.Equal(t, user.Username, resultUsers[i].Username, "Nomes de usários não coincidem")
+	// 	assert.Equal(t, user.Email, resultUsers[i].Email, "E-mails de usários não coincidem")
+	// 	assert.Equal(t, user.Password, resultUsers[i].Password, "Senhas de usários não coincidem")
+	// }
+}
