@@ -50,7 +50,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 			users.PUT("picture/", userHandler.UpdatePictureUser)
 			users.GET(":username/", userHandler.GetUser)
 			users.GET("suggestions/", userHandler.GetSuggestionsForUser)
-			
+
 			users.GET("me/", userHandler.UserMe)
 		}
 
@@ -85,6 +85,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	}
 
 	admin := api.Group("/admin")
+	admin.Use(middlewares.AuthMiddleware())
+	admin.Use(middlewares.SetUserMiddleware(userRepo))
 	admin.Use(middlewares.IsAdminUser())
 	{
 		admin.GET("/users", userHandler.GetAllUsers)
