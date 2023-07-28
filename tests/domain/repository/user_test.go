@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
+
 var db *gorm.DB
 
 var userRepo *repository.UserRepository
@@ -21,7 +22,7 @@ func setupTest() {
 		panic("Error connect database: " + err.Error())
 	}
 
-	err = db.AutoMigrate(&entity.User{})
+	err = db.AutoMigrate(&entity.User{}, &entity.Follow{})
 
 	if err != nil {
 		panic("Error migrating database schema: " + err.Error())
@@ -87,3 +88,24 @@ func TestFindAllUsersRepository(t *testing.T) {
 	}
 }
 
+func TestFindUsersByUsernameRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	user := &entity.User{
+		Username: "teste",
+		Email:    "teste@gmail.com",
+		Password: utils.GenerateRandomString(10),
+		FullName: "Teste OK",
+	}
+
+	err := userRepo.CreateUser(user)
+	assert.NoError(t, err, "Erro ao criar usuário")
+
+	userByUsernamed, _, _, err := userRepo.FindUserByUsername("teste")
+	assert.NoError(t, err, "Erro ao buscar usuários")
+
+	assert.Equal(t, user.Username, userByUsernamed.Username, "Nomes de usários não coincidem")
+	assert.Equal(t, user.Email, userByUsernamed.Email, "E-mails de usários não coincidem")
+	assert.Equal(t, user.Password, userByUsernamed.Password, "Senhas de usários não coincidem")
+}
