@@ -30,7 +30,7 @@ func (r *GenericRepository) GetByID(result interface{}, id uint) error {
 }
 
 func (r *GenericRepository) FindAll(entities interface{}) error {
-	if err := r.DB.First(entities).Error; err != nil {
+	if err := r.DB.Find(entities).Error; err != nil {
 		return err
 	}
 

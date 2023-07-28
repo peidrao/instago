@@ -22,7 +22,7 @@ func setupTest() {
 		panic("Error connect database: " + err.Error())
 	}
 
-	err = db.AutoMigrate(&entity.User{})
+	err = db.AutoMigrate(&entity.User{}, &entity.Follow{})
 
 	if err != nil {
 		panic("Error migrating database schema: " + err.Error())
@@ -70,6 +70,7 @@ func TestFindAllUsersRepository(t *testing.T) {
 		{Username: "user4", Email: "user4@example.com", Password: utils.GenerateRandomString(5)},
 		{Username: "user5", Email: "user5@example.com", Password: utils.GenerateRandomString(5)},
 	}
+
 	for i := range users {
 		if err := userRepo.CreateUser(&users[i]); err != nil {
 			t.Fatalf("Erro ao criar usuário: %v", err)
@@ -80,9 +81,31 @@ func TestFindAllUsersRepository(t *testing.T) {
 	assert.NoError(t, err, "Erro ao buscar usuários")
 	assert.Len(t, resultUsers, len(users), "Quantidade de usuários está incorreta")
 
-	// for i, user := range users {
-	// 	assert.Equal(t, user.Username, resultUsers[i].Username, "Nomes de usários não coincidem")
-	// 	assert.Equal(t, user.Email, resultUsers[i].Email, "E-mails de usários não coincidem")
-	// 	assert.Equal(t, user.Password, resultUsers[i].Password, "Senhas de usários não coincidem")
-	// }
+	for i, user := range users {
+		assert.Equal(t, user.Username, resultUsers[i].Username, "Nomes de usários não coincidem")
+		assert.Equal(t, user.Email, resultUsers[i].Email, "E-mails de usários não coincidem")
+		assert.Equal(t, user.Password, resultUsers[i].Password, "Senhas de usários não coincidem")
+	}
+}
+
+func TestFindUsersByUsernameRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	user := &entity.User{
+		Username: "teste",
+		Email:    "teste@gmail.com",
+		Password: utils.GenerateRandomString(10),
+		FullName: "Teste OK",
+	}
+
+	err := userRepo.CreateUser(user)
+	assert.NoError(t, err, "Erro ao criar usuário")
+
+	userByUsernamed, _, _, err := userRepo.FindUserByUsername("teste")
+	assert.NoError(t, err, "Erro ao buscar usuários")
+
+	assert.Equal(t, user.Username, userByUsernamed.Username, "Nomes de usários não coincidem")
+	assert.Equal(t, user.Email, userByUsernamed.Email, "E-mails de usários não coincidem")
+	assert.Equal(t, user.Password, userByUsernamed.Password, "Senhas de usários não coincidem")
 }
