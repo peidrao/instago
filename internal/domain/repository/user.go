@@ -71,15 +71,6 @@ func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {
 	return nil, nil
 }
 
-func (u *UserRepository) UpdateUser(user *entity.User, ID uint) (*entity.User, error) {
-	err := u.Update(entity.User{}, &user)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
-}
-
 func (u *UserRepository) FindUsersSuggestions(ID uint) []entity.User {
 	var users []entity.User
 	subQuery := u.DB.Table("follows").
