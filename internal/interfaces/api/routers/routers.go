@@ -34,9 +34,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	auth := api.Group("/auth")
 	{
-		auth.POST("users/", userHandler.CreateUser)
+		auth.POST("users/", userHandler.CreateUserHandler)
 		auth.POST("login/", userHandler.LoginHandler)
-		auth.POST("token_is_valid/", userHandler.TokenIsValid)
+		auth.POST("token_is_valid/", userHandler.TokenIsValidHandler)
 	}
 
 	authenticated := api.Group("/")
@@ -46,41 +46,41 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 		users := authenticated.Group("users/")
 		{
-			users.PUT("", userHandler.UpdateUser)
-			users.PUT("picture/", userHandler.UpdatePictureUser)
-			users.GET(":username/", userHandler.GetUser)
-			users.GET("suggestions/", userHandler.GetSuggestionsForUser)
+			users.PUT("", userHandler.UpdateUserHandler)
+			users.PUT("picture/", userHandler.UpdatePictureUserHandler)
+			users.GET(":username/", userHandler.GetUserHandler)
+			users.GET("suggestions/", userHandler.GetSuggestionsForUserHandler)
 
-			users.GET("me/", userHandler.UserMe)
+			users.GET("me/", userHandler.UserMeHandler)
 		}
 
 		follows := authenticated.Group("follow/")
 		{
-			follows.POST("", followHandler.FollowUser)
-			follows.POST("delete/", followHandler.UnfollowUser)
-			follows.GET(":username/", followHandler.GetFollowers)
-			follows.GET("requests/", followHandler.GetFollowersRequest)
-			follows.POST("requests/", followHandler.AcceptRequest)
+			follows.POST("", followHandler.FollowUserHandler)
+			follows.POST("delete/", followHandler.UnfollowUserHandler)
+			follows.GET(":username/", followHandler.GetFollowersHandler)
+			follows.GET("requests/", followHandler.GetFollowersRequestHandler)
+			follows.POST("requests/", followHandler.AcceptRequestHandler)
 		}
 
 		following := authenticated.Group("following/")
 		{
-			following.GET(":username/", followHandler.GetFollowing)
-			following.GET("requests/", followHandler.GetFollowingRequest)
-			following.POST("delete/", followHandler.CancelRequest)
+			following.GET(":username/", followHandler.GetFollowingHandler)
+			following.GET("requests/", followHandler.GetFollowingRequestHandler)
+			following.POST("delete/", followHandler.CancelRequestHandler)
 		}
 
 		posts := authenticated.Group("posts/")
 		{
-			posts.POST("", postHandler.CreatePost)
-			posts.GET("me/", postHandler.GetMePosts)
-			posts.GET(":id/", postHandler.GetPost)
-			posts.DELETE(":id/", postHandler.DeletePost)
+			posts.POST("", postHandler.CreatePostHandler)
+			posts.GET("me/", postHandler.GetMePostsHandler)
+			posts.GET(":id/", postHandler.GetPostHandler)
+			posts.DELETE(":id/", postHandler.DeletePostHandler)
 		}
 
 		feed := authenticated.Group("feed/")
 		{
-			feed.GET("", feedHandler.FeedMe)
+			feed.GET("", feedHandler.FeedMeHandler)
 		}
 	}
 
@@ -89,7 +89,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	admin.Use(middlewares.SetUserMiddleware(userRepo))
 	admin.Use(middlewares.IsAdminUser())
 	{
-		admin.GET("/users", userHandler.GetAllUsers)
+		admin.GET("/users", userHandler.GetAllUsersHandler)
 
 	}
 
