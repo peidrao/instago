@@ -68,7 +68,7 @@ func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {
 	if err := u.FindByAttr(&user, attr); err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return user, nil
 }
 
 func (u *UserRepository) FindUsersSuggestions(ID uint) []entity.User {
