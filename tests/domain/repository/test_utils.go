@@ -33,7 +33,7 @@ func setupTest() {
 }
 
 func tearDownTest() {
-	db.Migrator().DropTable(&entity.User{})
+	db.Migrator().DropTable(&entity.User{}, &entity.Post{})
 	db = nil
 	userRepo = nil
 }
