@@ -68,15 +68,6 @@ func (u *UserRepository) FindUserByEmail(email string) (*entity.User, error) {
 	if err := u.FindByAttr(&user, attr); err != nil {
 		return nil, err
 	}
-	return nil, nil
-}
-
-func (u *UserRepository) UpdateUser(user *entity.User, ID uint) (*entity.User, error) {
-	err := u.Update(entity.User{}, &user)
-	if err != nil {
-		return nil, err
-	}
-
 	return user, nil
 }
 

@@ -23,7 +23,7 @@ func NewFollowHandler(
 	}
 }
 
-func (f *FollowHandler) FollowUser(context *gin.Context) {
+func (f *FollowHandler) FollowUserHandler(context *gin.Context) {
 	var request requests.FolloweUserRequest
 	var follow entity.Follow
 	user, _ := context.Get("user")
@@ -96,7 +96,7 @@ func (f *FollowHandler) FollowUser(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": "User following"})
 }
 
-func (f *FollowHandler) UnfollowUser(context *gin.Context) {
+func (f *FollowHandler) UnfollowUserHandler(context *gin.Context) {
 	var request requests.FolloweUserRequest
 	var follow entity.Follow
 	userID := context.GetUint("userID")
@@ -129,7 +129,7 @@ func (f *FollowHandler) UnfollowUser(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": "Follower removal successful."})
 }
 
-func (f *FollowHandler) GetFollowing(context *gin.Context) {
+func (f *FollowHandler) GetFollowingHandler(context *gin.Context) {
 	username := context.Param("username")
 	var response []responses.FollowUserResponse
 
@@ -157,7 +157,7 @@ func (f *FollowHandler) GetFollowing(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) GetFollowers(context *gin.Context) {
+func (f *FollowHandler) GetFollowersHandler(context *gin.Context) {
 	username := context.Param("username")
 	var response []responses.FollowUserResponse
 
@@ -185,7 +185,7 @@ func (f *FollowHandler) GetFollowers(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) GetFollowersRequest(context *gin.Context) {
+func (f *FollowHandler) GetFollowersRequestHandler(context *gin.Context) {
 	var response []responses.FollowUserResponse
 
 	user, _ := context.Get("userID")
@@ -211,7 +211,7 @@ func (f *FollowHandler) GetFollowersRequest(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) AcceptRequest(context *gin.Context) {
+func (f *FollowHandler) AcceptRequestHandler(context *gin.Context) {
 	var request requests.UserIDRequest
 	var follow entity.Follow
 
@@ -246,7 +246,7 @@ func (f *FollowHandler) AcceptRequest(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"message": "Ok"})
 }
 
-func (f *FollowHandler) GetFollowingRequest(context *gin.Context) {
+func (f *FollowHandler) GetFollowingRequestHandler(context *gin.Context) {
 	var response []responses.FollowUserResponse
 
 	userID := context.GetUint("userID")
@@ -270,7 +270,7 @@ func (f *FollowHandler) GetFollowingRequest(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (f *FollowHandler) CancelRequest(context *gin.Context) {
+func (f *FollowHandler) CancelRequestHandler(context *gin.Context) {
 	var request requests.UserIDRequest
 	var follow entity.Follow
 

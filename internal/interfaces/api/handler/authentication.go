@@ -37,7 +37,7 @@ func (h *UserHandler) LoginHandler(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-func (h *UserHandler) TokenIsValid(context *gin.Context) {
+func (h *UserHandler) TokenIsValidHandler(context *gin.Context) {
 	var tokenRequest requests.TokenRequest
 
 	if err := context.ShouldBindJSON(&tokenRequest); err != nil {
