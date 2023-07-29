@@ -23,5 +23,48 @@ func TestPostCreateRepository(t *testing.T) {
 	assert.Equal(t, post.Location, firsPost.Location, "Localização não cincidem")
 	assert.Equal(t, post.ImageURL, firsPost.ImageURL, "Imagem não coincidem")
 	assert.Equal(t, post.UserID, firsPost.UserID, "Usuários não coincidem")
+}
 
+func TestFindPostsByUserRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	user := createUser(t, "test", "test@test.com", "Test")
+
+	for i := 0; i < 5; i++ {
+		createPost(t, user.ID)
+	}
+
+	postsByUser, err := postRepo.FindPostsByUser(user.ID)
+	assert.NoError(t, err, "Erro ao buscar postagens no banco de dados")
+	assert.Len(t, postsByUser, 5, "Quantidade de postagens não coincidem")
+}
+
+func TestFindPostByIDRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	user := createUser(t, "test", "test@test.com", "Test")
+
+	post := createPost(t, user.ID)
+
+	findPost, err := postRepo.FindPostByID(post.ID)
+	assert.NoError(t, err, "Erro ao buscar postagem pelo ID")
+
+	assert.Equal(t, post.Caption, findPost.Caption, "Legenda não coincidem")
+	assert.Equal(t, post.Location, findPost.Location, "Localização não cincidem")
+	assert.Equal(t, post.ImageURL, findPost.ImageURL, "Imagem não coincidem")
+	assert.Equal(t, post.UserID, findPost.UserID, "Usuários não coincidem")
+}
+
+func TestRemovePostRepository(t *testing.T) {
+	setupTest()
+	defer tearDownTest()
+
+	user := createUser(t, "test", "test@test.com", "Test")
+
+	post := createPost(t, user.ID)
+
+	err := postRepo.RemovePost(post.ID)
+	assert.NoError(t, err, "Erro ao remover postagem")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/interfaces/requests"
+	"github.com/peidrao/instago/internal/interfaces/responses"
 	"github.com/peidrao/instago/utils"
 )
 
@@ -22,8 +23,7 @@ func (h *UserHandler) LoginHandler(context *gin.Context) {
 		return
 	}
 
-	err = utils.ComparePassword([]byte(user.Password), []byte(credentials.Password))
-	if err != nil {
+	if err := utils.ComparePassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
@@ -34,7 +34,8 @@ func (h *UserHandler) LoginHandler(context *gin.Context) {
 		return
 	}
 
-	context.JSON(http.StatusOK, gin.H{"token": token})
+	response := responses.TokenResponse{Token: token}
+	context.JSON(http.StatusOK, response)
 }
 
 func (h *UserHandler) TokenIsValidHandler(context *gin.Context) {
@@ -52,5 +53,4 @@ func (h *UserHandler) TokenIsValidHandler(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusOK, gin.H{"valid": token.Valid})
-
 }

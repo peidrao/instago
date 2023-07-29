@@ -14,6 +14,7 @@ import (
 var db *gorm.DB
 var userRepo *repository.UserRepository
 var postRepo *repository.PostRepository
+var followRepo *repository.FollowRepository
 
 func setupTest() {
 	var err error
@@ -30,10 +31,11 @@ func setupTest() {
 
 	userRepo = repository.NewUserRepository(db)
 	postRepo = repository.NewPostRepository(db)
+	followRepo = repository.NewFollowRepository(db)
 }
 
 func tearDownTest() {
-	db.Migrator().DropTable(&entity.User{})
+	db.Migrator().DropTable(&entity.User{}, &entity.Post{}, &entity.Follow{})
 	db = nil
 	userRepo = nil
 }
@@ -65,4 +67,15 @@ func createPost(t *testing.T, userID uint) *entity.Post {
 	err := postRepo.CreatePost(post)
 	assert.NoError(t, err, "Erro ao criar postagem")
 	return post
+}
+
+func createFollow(t *testing.T, followerID, followingID uint) *entity.Follow {
+	follow := &entity.Follow{
+		FollowerID:  followerID,
+		FollowingID: followingID,
+	}
+
+	err := followRepo.CreateFollow(follow)
+	assert.NoError(t, err, "Erro ao seguir usuário")
+	return follow
 }
