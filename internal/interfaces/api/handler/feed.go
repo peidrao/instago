@@ -27,7 +27,7 @@ func NewFeedHandler(
 	}
 }
 
-func (f *FeedHandler) FeedMe(context *gin.Context) {
+func (f *FeedHandler) FeedMeHandler(context *gin.Context) {
 	var postResponse []responses.PostDetailResponse
 
 	userID := context.GetUint("userID")

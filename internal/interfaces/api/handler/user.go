@@ -24,7 +24,7 @@ func NewUserHandler(userRepository *repository.UserRepository) *UserHandler {
 	}
 }
 
-func (h *UserHandler) CreateUser(context *gin.Context) {
+func (h *UserHandler) CreateUserHandler(context *gin.Context) {
 
 	var user entity.User
 
@@ -71,7 +71,7 @@ func (h *UserHandler) CreateUser(context *gin.Context) {
 	context.JSON(http.StatusCreated, response)
 }
 
-func (h *UserHandler) GetUser(context *gin.Context) {
+func (h *UserHandler) GetUserHandler(context *gin.Context) {
 	username := context.Param("username")
 
 	user, followers, following, err := h.UserRepository.FindUserByUsername(username)
@@ -89,7 +89,7 @@ func (h *UserHandler) GetUser(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) GetAllUsers(context *gin.Context) {
+func (h *UserHandler) GetAllUsersHandler(context *gin.Context) {
 	users, err := h.UserRepository.FindAllUsers()
 
 	if err != nil {
@@ -99,7 +99,7 @@ func (h *UserHandler) GetAllUsers(context *gin.Context) {
 	context.JSON(http.StatusOK, users)
 }
 
-func (h *UserHandler) UserMe(context *gin.Context) {
+func (h *UserHandler) UserMeHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
 
 	user, followers, following, err := h.UserRepository.FindUserByID(userID)
@@ -117,7 +117,7 @@ func (h *UserHandler) UserMe(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) UpdateUser(context *gin.Context) {
+func (h *UserHandler) UpdateUserHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
 	var request requests.UserUpdateRequest
 
@@ -150,7 +150,7 @@ func (h *UserHandler) UpdateUser(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) UpdatePictureUser(context *gin.Context) {
+func (h *UserHandler) UpdatePictureUserHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
 
 	user, followers, following, err := h.UserRepository.FindUserByID(userID)
@@ -195,7 +195,7 @@ func (h *UserHandler) UpdatePictureUser(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) GetSuggestionsForUser(context *gin.Context) {
+func (h *UserHandler) GetSuggestionsForUserHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
 	var usesResponse []responses.UserDetailShortResponse
 

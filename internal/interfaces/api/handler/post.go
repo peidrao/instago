@@ -31,7 +31,7 @@ func NewPostHandler(
 	}
 }
 
-func (p *PostHandler) CreatePost(context *gin.Context) {
+func (p *PostHandler) CreatePostHandler(context *gin.Context) {
 	var request requests.PostRequest
 	userID := context.GetUint("userID")
 
@@ -73,7 +73,7 @@ func (p *PostHandler) CreatePost(context *gin.Context) {
 	context.JSON(http.StatusOK, post)
 }
 
-func (p *PostHandler) GetMePosts(context *gin.Context) {
+func (p *PostHandler) GetMePostsHandler(context *gin.Context) {
 	var postResponse []responses.PostDetailResponse
 	userID := context.GetUint("userID")
 
@@ -92,7 +92,7 @@ func (p *PostHandler) GetMePosts(context *gin.Context) {
 	context.JSON(http.StatusOK, postResponse)
 }
 
-func (p *PostHandler) GetPost(context *gin.Context) {
+func (p *PostHandler) GetPostHandler(context *gin.Context) {
 	ID := context.Param("id")
 
 	userID := context.GetUint("userID")
@@ -130,7 +130,7 @@ func (p *PostHandler) GetPost(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (p *PostHandler) DeletePost(context *gin.Context) {
+func (p *PostHandler) DeletePostHandler(context *gin.Context) {
 	ID := context.Param("id")
 
 	uintID, err := strconv.ParseUint(ID, 10, 64)
