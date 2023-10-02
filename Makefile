@@ -1,10 +1,12 @@
-psql.up:
+db.up:
 	docker-compose up -d 
 
-psql.exclude:
+db.down:
+	docker stop instago_db_1
+
+db.exclude:
 	docker stop instago_db_1
 	docker rm instago_db_1
-
 
 test:
 	go test -v ./tests/...
