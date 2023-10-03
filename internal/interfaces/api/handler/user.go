@@ -89,15 +89,7 @@ func (h *UserHandler) GetUserHandler(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-func (h *UserHandler) GetAllUsersHandler(context *gin.Context) {
-	users, err := h.UserRepository.FindAllUsers()
 
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
-
-	context.JSON(http.StatusOK, users)
-}
 
 func (h *UserHandler) UserMeHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
