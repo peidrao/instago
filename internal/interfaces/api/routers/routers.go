@@ -19,25 +19,17 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	router.Static("/static", "./static")
 
 	userRepo := repository.NewUserRepository(db)
-	userHandler := handler.NewUserHandler(userRepo)
-
 	followRepository := repository.NewFollowRepository(db)
-	followHandler := handler.NewFollowHandler(userRepo, followRepository)
-
 	postRepository := repository.NewPostRepository(db)
-	postHandler := handler.NewPostHandler(userRepo, postRepository, followRepository)
 
 	feedRepository := repository.NewFeedRepository(db)
-	feedHandler := handler.NewFeedHandler(userRepo, postRepository, feedRepository)
+
+	adminHandler := handler.NewAdminHandler(userRepo)
 
 	api := router.Group("/api")
 
 	auth := api.Group("/auth")
-	{
-		auth.POST("users/", userHandler.CreateUserHandler)
-		auth.POST("login/", userHandler.LoginHandler)
-		auth.POST("token_is_valid/", userHandler.TokenIsValidHandler)
-	}
+	setupAuthRoutes(auth, userRepo)
 
 	authenticated := api.Group("/")
 	authenticated.Use(middlewares.AuthMiddleware())
@@ -45,43 +37,19 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	{
 
 		users := authenticated.Group("users/")
-		{
-			users.PUT("", userHandler.UpdateUserHandler)
-			users.PUT("picture/", userHandler.UpdatePictureUserHandler)
-			users.GET(":username/", userHandler.GetUserHandler)
-			users.GET("suggestions/", userHandler.GetSuggestionsForUserHandler)
-
-			users.GET("me/", userHandler.UserMeHandler)
-		}
+		setupUserRoutes(users, userRepo)
 
 		follows := authenticated.Group("follow/")
-		{
-			follows.POST("", followHandler.FollowUserHandler)
-			follows.POST("delete/", followHandler.UnfollowUserHandler)
-			follows.GET(":username/", followHandler.GetFollowersHandler)
-			follows.GET("requests/", followHandler.GetFollowersRequestHandler)
-			follows.POST("requests/", followHandler.AcceptRequestHandler)
-		}
+		setupFollowRoutes(follows, userRepo, followRepository)
 
 		following := authenticated.Group("following/")
-		{
-			following.GET(":username/", followHandler.GetFollowingHandler)
-			following.GET("requests/", followHandler.GetFollowingRequestHandler)
-			following.POST("delete/", followHandler.CancelRequestHandler)
-		}
+		setupFollowingRoutes(following, userRepo, followRepository)
 
 		posts := authenticated.Group("posts/")
-		{
-			posts.POST("", postHandler.CreatePostHandler)
-			posts.GET("me/", postHandler.GetMePostsHandler)
-			posts.GET(":id/", postHandler.GetPostHandler)
-			posts.DELETE(":id/", postHandler.DeletePostHandler)
-		}
+		setupPostRoutes(posts, userRepo, followRepository, postRepository)
 
 		feed := authenticated.Group("feed/")
-		{
-			feed.GET("", feedHandler.FeedMeHandler)
-		}
+		setupFeedRoutes(feed, userRepo, feedRepository, postRepository)
 	}
 
 	admin := api.Group("/admin")
@@ -89,7 +57,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	admin.Use(middlewares.SetUserMiddleware(userRepo))
 	admin.Use(middlewares.IsAdminUser())
 	{
-		admin.GET("/users", userHandler.GetAllUsersHandler)
+		admin.GET("/users", adminHandler.GetAllUsersHandler)
 
 	}
 
