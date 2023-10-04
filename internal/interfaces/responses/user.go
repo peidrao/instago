@@ -28,3 +28,19 @@ type UserDetailResponse struct {
 
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type UserAllDetailResponse struct {
+	ID             uint      `json:"id"`
+	Username       string    `json:"username"`
+	FullName       string    `json:"string"`
+	Email          string    `json:"email"`
+	Password       string    `json:"password"`
+	Bio            string    `json:"bio"`
+	Link           string    `json:"link"`
+	ProfilePicture string    `json:"profile_picture"`
+	Active         bool      `json:"active"`
+	Private        bool      `json:"private"`
+	Admin          bool      `json:"admin"`
+	CreatedAt      time.Time `json:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at"`
+}

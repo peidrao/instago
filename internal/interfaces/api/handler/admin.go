@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/domain/repository"
+	"github.com/peidrao/instago/internal/interfaces/responses"
+	"net/http"
 )
 
 type AdminHandler struct {
@@ -24,5 +24,25 @@ func (a *AdminHandler) GetAllUsersHandler(context *gin.Context) {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	context.JSON(http.StatusOK, users)
+	usersResponse := make([]responses.UserAllDetailResponse, len(users))
+
+	for i, user := range users {
+		usersResponse[i] = responses.UserAllDetailResponse{
+			ID:             user.ID,
+			Username:       user.Username,
+			FullName:       user.FullName,
+			Email:          user.Email,
+			Password:       user.Password,
+			Bio:            user.Bio,
+			Link:           user.Link,
+			ProfilePicture: user.ProfilePicture,
+			Active:         user.IsActive,
+			Private:        user.IsPrivate,
+			Admin:          user.IsAdmin,
+			CreatedAt:      user.CreatedAt,
+			UpdatedAt:      user.UpdatedAt,
+		}
+	}
+
+	context.JSON(http.StatusOK, usersResponse)
 }
