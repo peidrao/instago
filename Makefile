@@ -16,3 +16,6 @@ run:
 
 lint: 
 	/home/pedro/go/bin/golangci-lint run
+
+fmt:
+	/home/pedro/go/bin/golangci-lint run --fix
