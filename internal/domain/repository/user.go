@@ -19,15 +19,6 @@ func (u *UserRepository) CreateUser(user *entity.User) error {
 	return u.Create(user)
 }
 
-func (u *UserRepository) FindAllUsers() ([]entity.User, error) {
-	var users []entity.User
-	if err := u.FindAll(&users); err != nil {
-		return nil, err
-	}
-
-	return users, nil
-}
-
 func (u *UserRepository) FindUserFollowersCount(user *entity.User) (uint, uint) {
 	followers := u.DB.Model(user).Where("is_accept= true").Association("Following").Count()
 
