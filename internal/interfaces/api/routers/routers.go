@@ -4,62 +4,59 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/peidrao/instago/internal/domain/repository"
-	"github.com/peidrao/instago/internal/interfaces/api/handler"
 	"github.com/peidrao/instago/internal/interfaces/api/middlewares"
 	"gorm.io/gorm"
 )
 
 func SetupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
-	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
-	config.AllowCredentials = true
-	config.AddAllowHeaders("authorization")
-	router.Use(cors.New(config))
+
+	setupCors(router)
+
 	router.Static("/static", "./static")
 
-	userRepo := repository.NewUserRepository(db)
+	userRepository := repository.NewUserRepository(db)
 	followRepository := repository.NewFollowRepository(db)
 	postRepository := repository.NewPostRepository(db)
 	adminRepository := repository.NewAdminRepository(db)
-
 	feedRepository := repository.NewFeedRepository(db)
 
 	api := router.Group("/api")
 
 	auth := api.Group("/auth")
-	setupAuthRoutes(auth, userRepo)
+	setupAuthRoutes(auth, userRepository)
 
 	authenticated := api.Group("/")
 	authenticated.Use(middlewares.AuthMiddleware())
-	authenticated.Use(middlewares.SetUserMiddleware(userRepo))
+	authenticated.Use(middlewares.SetUserMiddleware(userRepository))
 	{
 
 		users := authenticated.Group("users/")
-		setupUserRoutes(users, userRepo)
+		setupUserRoutes(users, userRepository)
 
 		follows := authenticated.Group("follow/")
-		setupFollowRoutes(follows, userRepo, followRepository)
+		setupFollowRoutes(follows, userRepository, followRepository)
 
 		following := authenticated.Group("following/")
-		setupFollowingRoutes(following, userRepo, followRepository)
+		setupFollowingRoutes(following, userRepository, followRepository)
 
 		posts := authenticated.Group("posts/")
-		setupPostRoutes(posts, userRepo, followRepository, postRepository)
+		setupPostRoutes(posts, userRepository, followRepository, postRepository)
 
 		feed := authenticated.Group("feed/")
-		setupFeedRoutes(feed, userRepo, feedRepository, postRepository)
+		setupFeedRoutes(feed, userRepository, feedRepository, postRepository)
 	}
 
-	adminHandler := handler.NewAdminHandler(adminRepository)
 	admin := api.Group("/admin")
-	admin.Use(middlewares.AuthMiddleware())
-	admin.Use(middlewares.SetUserMiddleware(userRepo))
-	admin.Use(middlewares.IsAdminUser())
-	{
-		admin.GET("/users", adminHandler.GetAllUsersHandler)
-
-	}
+	setupAdminRoutes(admin, adminRepository, userRepository)
 
 	return router
+}
+
+func setupCors(router *gin.Engine) {
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowCredentials = true
+	config.AddAllowHeaders("authorization")
+	router.Use(cors.New(config))
 }
