@@ -21,10 +21,9 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	userRepo := repository.NewUserRepository(db)
 	followRepository := repository.NewFollowRepository(db)
 	postRepository := repository.NewPostRepository(db)
+	adminRepository := repository.NewAdminRepository(db)
 
 	feedRepository := repository.NewFeedRepository(db)
-
-	adminHandler := handler.NewAdminHandler(userRepo)
 
 	api := router.Group("/api")
 
@@ -52,6 +51,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 		setupFeedRoutes(feed, userRepo, feedRepository, postRepository)
 	}
 
+	adminHandler := handler.NewAdminHandler(adminRepository)
 	admin := api.Group("/admin")
 	admin.Use(middlewares.AuthMiddleware())
 	admin.Use(middlewares.SetUserMiddleware(userRepo))
