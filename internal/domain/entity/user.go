@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"log"
 	"regexp"
 	"time"
 
@@ -51,7 +52,9 @@ func StrongPasswordValidator(f1 validator.FieldLevel) bool {
 
 func NewValidator() *validator.Validate {
 	validate := validator.New()
-	validate.RegisterValidation("strongPassword", StrongPasswordValidator)
+	if err := validate.RegisterValidation("strongPassword", StrongPasswordValidator); err != nil {
+		log.Fatalf("error validate: %v", err)
+	}
 	return validate
 }
 

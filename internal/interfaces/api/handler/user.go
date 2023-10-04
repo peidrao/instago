@@ -89,8 +89,6 @@ func (h *UserHandler) GetUserHandler(context *gin.Context) {
 	context.JSON(http.StatusOK, response)
 }
 
-
-
 func (h *UserHandler) UserMeHandler(context *gin.Context) {
 	userID := context.GetUint("userID")
 

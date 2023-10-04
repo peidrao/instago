@@ -38,7 +38,7 @@ func TestFindAllUsersRepository(t *testing.T) {
 		createUser(t, u.Username, u.Email, u.FullName)
 	}
 
-	resultUsers, err := userRepo.FindAllUsers()
+	resultUsers, err := adminRepo.FindAllUsers()
 	assert.NoError(t, err, "Erro ao buscar usuários")
 	assert.Len(t, resultUsers, len(users), "Quantidade de usuários está incorreta")
 

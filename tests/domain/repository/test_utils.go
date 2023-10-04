@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"log"
 	"testing"
 
 	"github.com/peidrao/instago/internal/domain/entity"
@@ -15,6 +16,7 @@ var db *gorm.DB
 var userRepo *repository.UserRepository
 var postRepo *repository.PostRepository
 var followRepo *repository.FollowRepository
+var adminRepo *repository.AdminRepository
 
 func setupTest() {
 	var err error
@@ -35,7 +37,9 @@ func setupTest() {
 }
 
 func tearDownTest() {
-	db.Migrator().DropTable(&entity.User{}, &entity.Post{}, &entity.Follow{})
+	if err := db.Migrator().DropTable(&entity.User{}, &entity.Post{}, &entity.Follow{}); err != nil {
+		log.Fatalf("Error dropping tables: %v", err)
+	}
 	db = nil
 	userRepo = nil
 }
