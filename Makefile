@@ -13,3 +13,6 @@ test:
 
 run:
 	go run cmd/app/main.go
+
+lint: 
+	/home/pedro/go/bin/golangci-lint run
