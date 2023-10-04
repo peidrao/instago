@@ -8,17 +8,17 @@ import (
 )
 
 type AdminHandler struct {
-	UserRepository *repository.UserRepository
+	AdminRepository *repository.AdminRepository
 }
 
-func NewAdminHandler(userRepository *repository.UserRepository) *AdminHandler {
+func NewAdminHandler(adminRepository *repository.AdminRepository) *AdminHandler {
 	return &AdminHandler{
-		UserRepository: userRepository,
+		AdminRepository: adminRepository,
 	}
 }
 
 func (a *AdminHandler) GetAllUsersHandler(context *gin.Context) {
-	users, err := a.UserRepository.FindAllUsers()
+	users, err := a.AdminRepository.FindAllUsers()
 
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
